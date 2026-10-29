@@ -1,0 +1,989 @@
+{
+  "about": "Shared webhook verification vectors; written by tools/webhook_vectors.py. Do not edit.",
+  "vectors": [
+    {
+      "name": "standard: whsec_ secret, native body",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: the raw secret works as well",
+      "scheme": "standard",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: header names in any case",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "Webhook-Id": "evt_01J9",
+        "WEBHOOK-TIMESTAMP": "1793000000",
+        "Webhook-Signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: rotation window, two signatures, the second matches",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,RmbBNBcEpT2X77CkQPMDf/2ue2RILHzTNF4TxQVo5YM= v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: the receiver holds two secrets",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfcHJldmlvdXNfc2VjcmV0XzIwMjY=",
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: a changed body is refused",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1002\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "standard: a wrong secret is refused",
+      "scheme": "standard",
+      "secrets": [
+        "sr_previous_secret_2026"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "standard: a changed id is refused",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_other",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "standard: older than the tolerance",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000301,
+      "expect": {
+        "ok": false,
+        "error": "timestamp_out_of_tolerance"
+      }
+    },
+    {
+      "name": "standard: further in the future than the tolerance",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1792999699,
+      "expect": {
+        "ok": false,
+        "error": "timestamp_out_of_tolerance"
+      }
+    },
+    {
+      "name": "standard: a wider tolerance given by the receiver",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000500,
+      "tolerance": 600,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard: no signature header",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "missing_header"
+      }
+    },
+    {
+      "name": "standard: no id header",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "missing_header"
+      }
+    },
+    {
+      "name": "standard: a timestamp that is not a number",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "17930x",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_timestamp"
+      }
+    },
+    {
+      "name": "standard: only signatures of another version",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1a,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "standard: a whsec_ secret that is not base64",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_!!not-base64!!"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_secret"
+      }
+    },
+    {
+      "name": "standard: no secret",
+      "scheme": "standard",
+      "secrets": [],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_secret"
+      }
+    },
+    {
+      "name": "standard: a signed body that is not JSON",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "not json",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,VzbjBCB36DxK9aWF0lxshSgLPLLjWHJO5SZBwa143QA="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_payload"
+      }
+    },
+    {
+      "name": "an unknown scheme",
+      "scheme": "github",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "unknown_scheme"
+      }
+    },
+    {
+      "name": "standard + CloudEvents structured",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"specversion\":\"1.0\",\"id\":\"evt_01J9\",\"source\":\"https://admin.superroute.ca/webhook-sources/partner-locker/2\",\"type\":\"ca.superroute.partner_locker.delivery.delivered\",\"subject\":\"partner_locker_delivery/PLD-1001\",\"time\":\"2026-10-29T12:00:00+00:00\",\"srbusiness\":2,\"datacontenttype\":\"application/json\",\"data\":{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https://example.com/x\",\"note\":\"café – 送达\"}}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,mQsmrwakzy6qmGhdIxXiwv7tJazIKvZm8Ast9qgoJO8=",
+        "Content-Type": "application/cloudevents+json"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": "partner_locker_delivery/PLD-1001",
+          "source": "https://admin.superroute.ca/webhook-sources/partner-locker/2",
+          "business": 2,
+          "attempt": null,
+          "format": "ce_structured",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "standard + CloudEvents binary",
+      "scheme": "standard",
+      "secrets": [
+        "whsec_c3JfdGVzdF9zZWNyZXRfMjAyNl9BQkNkZWY="
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "webhook-id": "evt_01J9",
+        "webhook-timestamp": "1793000000",
+        "webhook-signature": "v1,AzF9UQZmxvbOA0bNNE+/qYnVILgYcs6Q4pD0jXzmF0s=",
+        "Content-Type": "application/json",
+        "ce-specversion": "1.0",
+        "ce-id": "evt_01J9",
+        "ce-source": "https://admin.superroute.ca/webhook-sources/partner-locker/2",
+        "ce-type": "ca.superroute.partner_locker.delivery.delivered",
+        "ce-subject": "partner_locker_delivery/PLD-1001",
+        "ce-time": "2026-10-29T12:00:00+00:00",
+        "ce-srbusiness": "2",
+        "ce-srattempt": "3"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": "partner_locker_delivery/PLD-1001",
+          "source": "https://admin.superroute.ca/webhook-sources/partner-locker/2",
+          "business": 2,
+          "attempt": 3,
+          "format": "ce_binary",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "tenant: the v2 signature",
+      "scheme": "tenant",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"order_id\":1001,\"status\":17,\"status_name\":\"Delivered\",\"event_id\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Signature": "96c5d0f2b8df62527d8afd2713cdeb30c093b3e98f63b0c8c5d5850e502612aa",
+        "X-Webhook-Event-Id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature-V2": "379d3492100a8e6b916078878d58f51723e659f31cb3e2d1ef300d38f67aa714"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+          "type": null,
+          "time": null,
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "order_id": 1001,
+            "status": 17,
+            "status_name": "Delivered",
+            "event_id": "0f8fad5b-d9cb-469f-a165-70867728950e"
+          }
+        }
+      }
+    },
+    {
+      "name": "tenant: a retry three hours after dispatch is inside the default tolerance",
+      "scheme": "tenant",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"order_id\":1001,\"status\":17,\"status_name\":\"Delivered\",\"event_id\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Signature": "96c5d0f2b8df62527d8afd2713cdeb30c093b3e98f63b0c8c5d5850e502612aa",
+        "X-Webhook-Event-Id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature-V2": "379d3492100a8e6b916078878d58f51723e659f31cb3e2d1ef300d38f67aa714"
+      },
+      "now": 1793011000,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+          "type": null,
+          "time": null,
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "order_id": 1001,
+            "status": 17,
+            "status_name": "Delivered",
+            "event_id": "0f8fad5b-d9cb-469f-a165-70867728950e"
+          }
+        }
+      }
+    },
+    {
+      "name": "tenant: older than the default tolerance",
+      "scheme": "tenant",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"order_id\":1001,\"status\":17,\"status_name\":\"Delivered\",\"event_id\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Signature": "96c5d0f2b8df62527d8afd2713cdeb30c093b3e98f63b0c8c5d5850e502612aa",
+        "X-Webhook-Event-Id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature-V2": "379d3492100a8e6b916078878d58f51723e659f31cb3e2d1ef300d38f67aa714"
+      },
+      "now": 1793012601,
+      "expect": {
+        "ok": false,
+        "error": "timestamp_out_of_tolerance"
+      }
+    },
+    {
+      "name": "tenant: a wrong secret is refused",
+      "scheme": "tenant",
+      "secrets": [
+        "sr_previous_secret_2026"
+      ],
+      "body": "{\"order_id\":1001,\"status\":17,\"status_name\":\"Delivered\",\"event_id\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Signature": "96c5d0f2b8df62527d8afd2713cdeb30c093b3e98f63b0c8c5d5850e502612aa",
+        "X-Webhook-Event-Id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature-V2": "379d3492100a8e6b916078878d58f51723e659f31cb3e2d1ef300d38f67aa714"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "tenant: the legacy signature alone is not enough",
+      "scheme": "tenant",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"order_id\":1001,\"status\":17,\"status_name\":\"Delivered\",\"event_id\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Signature": "96c5d0f2b8df62527d8afd2713cdeb30c093b3e98f63b0c8c5d5850e502612aa",
+        "X-Webhook-Event-Id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+        "X-Webhook-Timestamp": "1793000000"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "missing_header"
+      }
+    },
+    {
+      "name": "partner_locker: the native signature",
+      "scheme": "partner_locker",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Delivery-Id": "dlv_5501",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "tpd: the same recipe as partner_locker",
+      "scheme": "tpd",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Delivery-Id": "dlv_5501",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "evt_01J9",
+          "type": "partner_locker.delivery.delivered",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "evt_01J9",
+            "event_type": "partner_locker.delivery.delivered",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "delivery_no": "PLD-1001",
+              "url": "https://example.com/x",
+              "note": "café – 送达"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "partner_locker: the delivery id is signed",
+      "scheme": "partner_locker",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Delivery-Id": "dlv_5502",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "partner_locker: no delivery id",
+      "scheme": "partner_locker",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "missing_header"
+      }
+    },
+    {
+      "name": "partner_locker: older than the tolerance",
+      "scheme": "partner_locker",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Delivery-Id": "dlv_5501",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000400,
+      "expect": {
+        "ok": false,
+        "error": "timestamp_out_of_tolerance"
+      }
+    },
+    {
+      "name": "loading_plan: the native signature",
+      "scheme": "loading_plan",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"lpe_77\",\"event_type\":\"solve_run.completed\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"run_id\":77}}",
+      "headers": {
+        "X-Webhook-Event-Id": "lpe_77",
+        "X-Webhook-Event-Type": "solve_run.completed",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature": "v1=d0bdb55eb00be1712d396fcc9380ce0f78d549fd67fb109f4544c3886e05daf4"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "lpe_77",
+          "type": "solve_run.completed",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event_id": "lpe_77",
+            "event_type": "solve_run.completed",
+            "occurred_at": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "run_id": 77
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "loading_plan: a partner_locker signature does not pass",
+      "scheme": "loading_plan",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event_id\":\"evt_01J9\",\"event_type\":\"partner_locker.delivery.delivered\",\"occurred_at\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"delivery_no\":\"PLD-1001\",\"url\":\"https:\\/\\/example.com\\/x\",\"note\":\"caf\\u00e9 – 送达\"}}",
+      "headers": {
+        "X-Webhook-Id": "evt_01J9",
+        "X-Webhook-Delivery-Id": "dlv_5501",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Key-Id": "k1",
+        "X-Webhook-Signature": "v1=NxAKb0KKZRNdfwgP17ukQ8fgD1xBDu73RbPXpArZoM4="
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    },
+    {
+      "name": "open_platform: the native signature",
+      "scheme": "open_platform",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event\":\"job.succeeded\",\"job_id\":\"job_42\",\"delivery_id\":\"dlv_9\",\"attempt\":1,\"occurred_at\":\"2026-10-29T12:00:00+00:00\"}",
+      "headers": {
+        "X-Open-Event": "job.succeeded",
+        "X-Open-Delivery": "dlv_9",
+        "X-Open-Timestamp": "1793000000",
+        "X-Open-Signature": "v1=c11128e92aff3818b29b8165b15f7539516f85fde28fe957424eeec98a484a0f"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": "dlv_9",
+          "type": "job.succeeded",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event": "job.succeeded",
+            "job_id": "job_42",
+            "delivery_id": "dlv_9",
+            "attempt": 1,
+            "occurred_at": "2026-10-29T12:00:00+00:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "open_platform: an unsigned callback is refused",
+      "scheme": "open_platform",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event\":\"job.succeeded\",\"job_id\":\"job_42\",\"delivery_id\":\"dlv_9\",\"attempt\":1,\"occurred_at\":\"2026-10-29T12:00:00+00:00\"}",
+      "headers": {
+        "X-Open-Event": "job.succeeded",
+        "X-Open-Delivery": "dlv_9",
+        "X-Open-Timestamp": "1793000000"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "missing_header"
+      }
+    },
+    {
+      "name": "dataset: the native signature",
+      "scheme": "dataset",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event\":\"record_created\",\"dataset_id\":5,\"timestamp\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"id\":9}}",
+      "headers": {
+        "X-Webhook-Event": "record_created",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature": "0bacb2c5ce734404e920ddbfa81b33bc7a031ef52663c07079bdbc3ff21bdb69"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": true,
+        "event": {
+          "id": null,
+          "type": "record_created",
+          "time": "2026-10-29T12:00:00+00:00",
+          "subject": null,
+          "source": null,
+          "business": null,
+          "attempt": null,
+          "format": "native",
+          "data": {
+            "event": "record_created",
+            "dataset_id": 5,
+            "timestamp": "2026-10-29T12:00:00+00:00",
+            "data": {
+              "id": 9
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "dataset: older than the tolerance",
+      "scheme": "dataset",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event\":\"record_created\",\"dataset_id\":5,\"timestamp\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"id\":9}}",
+      "headers": {
+        "X-Webhook-Event": "record_created",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature": "0bacb2c5ce734404e920ddbfa81b33bc7a031ef52663c07079bdbc3ff21bdb69"
+      },
+      "now": 1793000301,
+      "expect": {
+        "ok": false,
+        "error": "timestamp_out_of_tolerance"
+      }
+    },
+    {
+      "name": "dataset: a changed body is refused",
+      "scheme": "dataset",
+      "secrets": [
+        "sr_test_secret_2026_ABCdef"
+      ],
+      "body": "{\"event\":\"record_created\",\"dataset_id\":5,\"timestamp\":\"2026-10-29T12:00:00+00:00\",\"data\":{\"id\":8}}",
+      "headers": {
+        "X-Webhook-Event": "record_created",
+        "X-Webhook-Timestamp": "1793000000",
+        "X-Webhook-Signature": "0bacb2c5ce734404e920ddbfa81b33bc7a031ef52663c07079bdbc3ff21bdb69"
+      },
+      "now": 1793000030,
+      "expect": {
+        "ok": false,
+        "error": "invalid_signature"
+      }
+    }
+  ]
+}
