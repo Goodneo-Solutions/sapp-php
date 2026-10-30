@@ -64,14 +64,30 @@ final class PartnerClient
             usleep((int) ($seconds * 1_000_000));
         };
         $this->onSignedOut = $onSignedOut !== null ? \Closure::fromCallable($onSignedOut) : null;
-        $this->api = new PartnerApi(function (Operation $operation, array $params, ?array $body, array $files) {
-            // Public calls name the service provider in the path; take it from the client unless the caller passes one.
-            if (str_contains($operation->path, '{clientCode}') && ($params['clientCode'] ?? null) === null && $this->clientCode !== null) {
-                $params['clientCode'] = $this->clientCode;
-            }
+        $this->api = new PartnerApi(fn (Operation $operation, array $params, ?array $body, array $files): mixed => $this->callOperation($operation, $params, $body, $files));
+    }
 
-            return $this->call($operation, $params, $body, $files);
-        });
+    /**
+     * Building on the sApp core: calls an operation described by hand exactly as the generated methods of $api do —
+     * the same sign-in headers (the token, or the app key when the operation allows it), one refresh and retry after a
+     * 401, an Idempotency-Key made once per call (and kept across that retry) when the operation declares one and none
+     * is given, retries of GET calls, and SuperrouteException for a refusal (status 400 or more, or "result": false).
+     * Path and query values, header parameters (under the header's own name) and the extra query (under
+     * Operation::EXTRA_QUERY) travel in $params; {clientCode} is filled from the client when not given. For packages
+     * such as sLocker that add their own operations on top of this client.
+     *
+     * @param array<string, mixed> $params
+     * @param array<string, mixed>|null $body
+     * @param list<OperationFile> $files
+     */
+    public function callOperation(Operation $operation, array $params = [], ?array $body = null, array $files = []): mixed
+    {
+        // Public calls name the service provider in the path; take it from the client unless the caller passes one.
+        if (str_contains($operation->path, '{clientCode}') && ($params['clientCode'] ?? null) === null && $this->clientCode !== null) {
+            $params['clientCode'] = $this->clientCode;
+        }
+
+        return $this->call($operation, $params, $body, $files);
     }
 
     public function clientCode(): ?string
@@ -333,16 +349,17 @@ final class PartnerClient
         $url = Http::url($this->baseUrl, $operation, $params);
         [$encoded, $bodyHeaders] = Http::encodeBody($operation->body, $body, $files);
         $retryable = $operation->method === 'GET';
-        $headers = $this->authorise($operation, $this->baseHeaders() + $bodyHeaders);
+        $perCall = Http::callHeaders($operation, $params);
+        $headers = Http::withCallHeaders($this->authorise($operation, $this->baseHeaders() + $bodyHeaders), $perCall);
         $response = Http::send($this->transport, $operation->method, $url, $headers, $encoded, $this->retries, $retryable, $this->sleep);
         // An access token can end early (revoked, the person's access changed): refresh once and try again.
         if ($response->status === 401 && isset($headers['Authorization'])) {
             $this->refresh();
-            $headers = $this->authorise($operation, $this->baseHeaders() + $bodyHeaders);
+            $headers = Http::withCallHeaders($this->authorise($operation, $this->baseHeaders() + $bodyHeaders), $perCall);
             $response = Http::send($this->transport, $operation->method, $url, $headers, $encoded, $this->retries, $retryable, $this->sleep);
         }
 
-        return Http::orThrow($response);
+        return Http::orThrow($response, true);
     }
 
     /**

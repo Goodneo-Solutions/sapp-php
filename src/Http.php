@@ -7,7 +7,7 @@ namespace Superroute\SApp;
 /** @internal The request building and sending both clients share. */
 final class Http
 {
-    public const SDK_VERSION = '0.2.1';
+    public const SDK_VERSION = '0.2.2';
     public const DEFAULT_BASE_URL = 'https://open.superroute.ca';
 
     public static function defaultTransport(): Transport
@@ -45,17 +45,91 @@ final class Http
         $path = rtrim($path, '/');
         $url = $baseUrl . ($path === '' ? '/' : $path);
         $pairs = [];
-        foreach ($operation->query as $name) {
-            $value = $params[$name] ?? null;
+        $taken = [];
+        $add = static function (string $name, mixed $value) use (&$pairs, &$taken): void {
             if ($value === null) {
-                continue;
+                return;
             }
+            $taken[$name] = true;
             foreach (is_array($value) && array_is_list($value) ? $value : [$value] as $item) {
-                $pairs[] = rawurlencode($name) . '=' . rawurlencode(self::text($item));
+                if ($item !== null) {
+                    $pairs[] = rawurlencode($name) . '=' . rawurlencode(self::text($item));
+                }
+            }
+        };
+        foreach ($operation->query as $name) {
+            $add($name, $params[$name] ?? null);
+        }
+        // The extra query comes after the declared names and never replaces one of them.
+        $extra = $params[Operation::EXTRA_QUERY] ?? null;
+        if (is_array($extra)) {
+            foreach ($extra as $name => $value) {
+                $name = (string) $name;
+                if ($name === '' || in_array($name, $operation->query, true) || isset($taken[$name])) {
+                    continue;
+                }
+                $add($name, $value);
             }
         }
 
         return $pairs === [] ? $url : $url . '?' . implode('&', $pairs);
+    }
+
+    /** Headers the SDK sets itself; a header argument never replaces them. */
+    private const PROTECTED_HEADERS = ['authorization', 'x-app-key', 'x-sapp', 'accept', 'accept-language', 'content-type'];
+
+    /**
+     * The header parameters of one call, worked out once so every attempt of the call sends the same values: an
+     * operation that declares Idempotency-Key gets a fresh key when the caller gave none.
+     *
+     * @param array<string, mixed> $params
+     * @return array<string, string>
+     */
+    public static function callHeaders(Operation $operation, array $params): array
+    {
+        $out = [];
+        foreach ($operation->headers as $name) {
+            if (in_array(strtolower($name), self::PROTECTED_HEADERS, true)) {
+                continue;
+            }
+            $value = $params[$name] ?? null;
+            if ($value !== null && self::text($value) !== '') {
+                $out[$name] = self::text($value);
+            } elseif (strtolower($name) === 'idempotency-key') {
+                $out[$name] = self::uuid();
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Adds the call headers without replacing a header the SDK set (compared without regard to case).
+     *
+     * @param array<string, string> $headers
+     * @param array<string, string> $extra
+     * @return array<string, string>
+     */
+    public static function withCallHeaders(array $headers, array $extra): array
+    {
+        $taken = array_map('strtolower', array_keys($headers));
+        foreach ($extra as $name => $value) {
+            if (!in_array(strtolower($name), $taken, true)) {
+                $headers[$name] = $value;
+            }
+        }
+
+        return $headers;
+    }
+
+    /** A random (version 4) UUID, for an idempotency key the caller did not give. */
+    public static function uuid(): string
+    {
+        $b = random_bytes(16);
+        $b[6] = chr((ord($b[6]) & 0x0f) | 0x40);
+        $b[8] = chr((ord($b[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($b), 4));
     }
 
     /**
@@ -163,10 +237,13 @@ final class Http
         }
     }
 
-    public static function orThrow(Response $response): mixed
+    /** Throws on status 400 or more and, for API calls ($refuseResultFalse), on a JSON object answering `result: false`. */
+    public static function orThrow(Response $response, bool $refuseResultFalse = false): mixed
     {
         $body = self::decode($response);
-        if ($response->status >= 400) {
+        $refused = $refuseResultFalse && is_array($body) && !array_is_list($body)
+            && array_key_exists('result', $body) && $body['result'] === false;
+        if ($response->status >= 400 || $refused) {
             throw SuperrouteException::from($response->status, $body, $response->header('X-Request-Id'));
         }
 

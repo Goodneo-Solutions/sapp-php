@@ -2,7 +2,7 @@
     "name": "superroute/sapp",
     "description": "sApp for PHP: sign-in, the platform app API, Open Platform capabilities and Superroute webhook verification.",
     "type": "library",
-    "license": "MIT",
+    "license": "proprietary",
     "keywords": ["superroute", "logistics", "delivery", "sdk", "webhooks"],
     "homepage": "https://github.com/Goodneo-Solutions/sapp-php",
     "authors": [{ "name": "Goodneo Solutions", "homepage": "https://superroute.ca" }],

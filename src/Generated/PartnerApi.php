@@ -32,7 +32,7 @@ final class PartnerApi
             'customerMovingOrderCalculatePrice' => new Operation('POST', '/app/v1/moving-orders/calculate-price', 'token', [], 'json'),
             'customerMovingOrderCancel' => new Operation('POST', '/app/v1/moving-orders/{id}/cancel', 'token', [], null),
             'customerMovingOrderConfig' => new Operation('GET', '/app/v1/moving-orders/config', 'token', [], null),
-            'customerMovingOrderCreate' => new Operation('POST', '/app/v1/moving-orders', 'token', [], 'json'),
+            'customerMovingOrderCreate' => new Operation('POST', '/app/v1/moving-orders', 'token', [], 'json', ['Idempotency-Key']),
             'customerMovingOrderPay' => new Operation('POST', '/app/v1/moving-orders/{id}/pay', 'token', [], 'json'),
             'customerMovingOrderPaymentInfo' => new Operation('GET', '/app/v1/moving-orders/{id}/payment-info', 'token', [], null),
             'customerMovingOrderShow' => new Operation('GET', '/app/v1/moving-orders/{id}', 'token', [], null),
@@ -51,7 +51,7 @@ final class PartnerApi
             'customerSavedFormAnswersList' => new Operation('GET', '/app/v1/saved-form-answers', 'token', [], null),
             'customerSavedFormAnswersSave' => new Operation('PUT', '/app/v1/saved-form-answers/{formId}', 'token', [], 'json'),
             'customerShippingOrderCancel' => new Operation('POST', '/app/v1/shipping-orders/{id}/cancel', 'token', [], null),
-            'customerShippingOrderCreate' => new Operation('POST', '/app/v1/shipping-orders/services/{serviceCode}/orders', 'token', [], 'json'),
+            'customerShippingOrderCreate' => new Operation('POST', '/app/v1/shipping-orders/services/{serviceCode}/orders', 'token', [], 'json', ['Idempotency-Key']),
             'customerShippingOrderEstimatePrice' => new Operation('POST', '/app/v1/shipping-orders/services/{serviceCode}/estimate-price', 'token', [], 'json'),
             'customerShippingOrderPay' => new Operation('POST', '/app/v1/shipping-orders/{id}/pay', 'token', [], 'json'),
             'customerShippingOrderPaymentInfo' => new Operation('GET', '/app/v1/shipping-orders/{id}/payment-info', 'token', [], null),
@@ -63,7 +63,7 @@ final class PartnerApi
             'customerStorageOrderCalculatePrice' => new Operation('POST', '/app/v1/storage-orders/calculate-price', 'token', [], 'json'),
             'customerStorageOrderCancel' => new Operation('POST', '/app/v1/storage-orders/{id}/cancel', 'token', [], null),
             'customerStorageOrderConfig' => new Operation('GET', '/app/v1/storage-orders/config', 'token', [], null),
-            'customerStorageOrderCreate' => new Operation('POST', '/app/v1/storage-orders', 'token', [], 'json'),
+            'customerStorageOrderCreate' => new Operation('POST', '/app/v1/storage-orders', 'token', [], 'json', ['Idempotency-Key']),
             'customerStorageOrderPay' => new Operation('POST', '/app/v1/storage-orders/{id}/pay', 'token', [], 'json'),
             'customerStorageOrderPaymentInfo' => new Operation('GET', '/app/v1/storage-orders/{id}/payment-info', 'token', [], null),
             'customerStorageOrderShow' => new Operation('GET', '/app/v1/storage-orders/{id}', 'token', [], null),
@@ -140,7 +140,6 @@ final class PartnerApi
             'platformAppBootstrap' => new Operation('GET', '/app/v1/clients/{clientCode}/bootstrap', 'key', ['platform', 'app_version'], null),
             'platformAppCancelAccountDeletion' => new Operation('DELETE', '/app/v1/privacy/account-deletion', 'token', [], null),
             'platformAppCancelReturn' => new Operation('POST', '/app/v1/returns/{returnId}/cancel', 'token', [], null),
-            'platformAppCollectPickup' => new Operation('POST', '/app/v1/pickups/{deliveryId}/collect', 'token', [], 'json'),
             'platformAppCompleteRegistration' => new Operation('POST', '/app/v1/registration-details', 'token', [], 'json'),
             'platformAppCreateReturn' => new Operation('POST', '/app/v1/returns', 'token', [], 'json'),
             'platformAppGroupBuy' => new Operation('GET', '/app/v1/group-buys/{code}', 'token', ['leader', 'locale'], null),
@@ -168,8 +167,8 @@ final class PartnerApi
             'platformAppGuestGroupBuyOrder' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/group-buy-orders/{token}', 'key', ['locale'], null),
             'platformAppGuestGroupBuyOrderPay' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buy-orders/{token}/pay', 'key', ['locale'], null),
             'platformAppGuestGroupBuyOrderReceived' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buy-orders/{token}/received', 'key', ['locale'], null),
-            'platformAppGuestGroupBuyOrders' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/group-buy-orders', 'key', ['locale'], null),
-            'platformAppGuestGroupBuyPlaceOrder' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buys/{code}/order', 'key', ['locale'], 'json'),
+            'platformAppGuestGroupBuyOrders' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/group-buy-orders', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestGroupBuyPlaceOrder' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buys/{code}/order', 'key', ['locale'], 'json', ['X-Guest-Contact-Token']),
             'platformAppGuestGroupBuyQuote' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buys/{code}/quote', 'key', ['locale'], 'json'),
             'platformAppGuestGroupBuyVerifyComplete' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buys/{code}/verify/complete', 'key', ['locale'], 'json'),
             'platformAppGuestGroupBuyVerifyRequest' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/group-buys/{code}/verify/request', 'key', ['locale'], 'json'),
@@ -179,61 +178,37 @@ final class PartnerApi
             'platformAppGuestMallHome' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/mall/home', 'key', ['locale'], null),
             'platformAppGuestMallSearch' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/mall/search', 'key', ['q', 'locale'], null),
             'platformAppGuestMallStores' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/mall/stores', 'key', ['type', 'tag', 'q', 'page', 'locale'], null),
-            'platformAppGuestShipment' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}', 'key', ['locale'], null),
-            'platformAppGuestShipmentCancel' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/cancel', 'key', [], null),
-            'platformAppGuestShipmentLabel' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/label', 'key', [], null),
+            'platformAppGuestShipment' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}', 'key', ['locale'], null, ['X-Guest-Order-Token', 'X-Guest-Contact-Token']),
+            'platformAppGuestShipmentCancel' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/cancel', 'key', [], null, ['X-Guest-Order-Token', 'X-Guest-Contact-Token']),
+            'platformAppGuestShipmentLabel' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/label', 'key', [], null, ['X-Guest-Order-Token', 'X-Guest-Contact-Token']),
             'platformAppGuestShipmentRate' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/shipments/rate', 'key', [], 'json'),
-            'platformAppGuestShipmentSubmit' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/shipments', 'key', [], 'json'),
-            'platformAppGuestShipments' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments', 'key', ['locale'], null),
+            'platformAppGuestShipmentSubmit' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/shipments', 'key', [], 'json', ['X-Guest-Contact-Token']),
+            'platformAppGuestShipments' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/shipments', 'key', ['locale'], null, ['X-Guest-Contact-Token']),
             'platformAppGuestStore' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}', 'key', ['q', 'cat', 'sort', 'table', 'locale'], null),
-            'platformAppGuestStoreCart' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart', 'key', ['locale'], null),
-            'platformAppGuestStoreCartAdd' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items', 'key', ['locale'], 'json'),
-            'platformAppGuestStoreCartRemove' => new Operation('DELETE', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId}', 'key', ['locale'], null),
-            'platformAppGuestStoreCartUpdate' => new Operation('PATCH', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId}', 'key', ['locale'], 'json'),
+            'platformAppGuestStoreCart' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart', 'key', ['locale'], null, ['X-Guest-Cart-Token']),
+            'platformAppGuestStoreCartAdd' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items', 'key', ['locale'], 'json', ['X-Guest-Cart-Token']),
+            'platformAppGuestStoreCartRemove' => new Operation('DELETE', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId}', 'key', ['locale'], null, ['X-Guest-Cart-Token']),
+            'platformAppGuestStoreCartUpdate' => new Operation('PATCH', '/app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId}', 'key', ['locale'], 'json', ['X-Guest-Cart-Token']),
             'platformAppGuestStoreCategory' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/categories/{categoryId}', 'key', ['sort', 'sub', 'in_stock', 'page', 'locale'], null),
-            'platformAppGuestStoreCheckoutPlace' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/place', 'key', ['locale'], 'json'),
-            'platformAppGuestStoreCheckoutQuote' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/quote', 'key', ['locale'], 'json'),
+            'platformAppGuestStoreCheckoutPlace' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/place', 'key', ['locale'], 'json', ['X-Guest-Cart-Token']),
+            'platformAppGuestStoreCheckoutQuote' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/quote', 'key', ['locale'], 'json', ['X-Guest-Cart-Token']),
             'platformAppGuestStoreHome' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/home', 'key', ['locale'], null),
-            'platformAppGuestStoreOrder' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/store-orders/{code}', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderCancel' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/cancel', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderConfirmPayment' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/confirm-payment', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderLockerOpen' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-open', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderLockerRefund' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-refund', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderPay' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/pay', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderReorder' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/reorder', 'key', ['locale'], null),
-            'platformAppGuestStoreOrderReturn' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/return', 'key', ['locale'], 'json'),
-            'platformAppGuestStoreOrderReview' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/review/{productId}', 'key', ['locale'], 'json'),
+            'platformAppGuestStoreOrder' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/store-orders/{code}', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderCancel' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/cancel', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderConfirmPayment' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/confirm-payment', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderLockerOpen' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-open', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderLockerRefund' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-refund', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderPay' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/pay', 'key', ['locale'], null, ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderReorder' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/reorder', 'key', ['locale'], null, ['X-Guest-Cart-Token', 'X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderReturn' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/return', 'key', ['locale'], 'json', ['X-Guest-Order-Token']),
+            'platformAppGuestStoreOrderReview' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/review/{productId}', 'key', ['locale'], 'json', ['X-Guest-Order-Token']),
             'platformAppGuestStoreProduct' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/products/{productId}', 'key', ['locale'], null),
             'platformAppGuestStorefront' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/storefront', 'key', ['locale'], null),
             'platformAppGuestTrack' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/track', 'key', [], 'json'),
             'platformAppGuestVerifyComplete' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/verify/complete', 'key', [], 'json'),
             'platformAppGuestVerifyRequest' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/verify/request', 'key', [], 'json'),
-            'platformAppHandOverPickup' => new Operation('POST', '/app/v1/pickups/{deliveryId}/handoff', 'token', [], 'json'),
             'platformAppHome' => new Operation('GET', '/app/v1/home', 'token', ['latitude', 'longitude'], null),
             'platformAppLinkResolve' => new Operation('GET', '/app/v1/links/resolve', 'token', ['url', 'locale'], null),
-            'platformAppLockerLocation' => new Operation('GET', '/app/v1/locker-locations/{locationId}', 'token', ['latitude', 'longitude', 'origin_address_1', 'origin_address_2', 'origin_city', 'origin_province', 'origin_country', 'origin_postcode'], null),
-            'platformAppLockerLocationGuide' => new Operation('GET', '/app/v1/locker-locations/{locationId}/guide', 'token', [], null),
-            'platformAppLockerLocationGuideFeedback' => new Operation('POST', '/app/v1/locker-locations/{locationId}/guide/feedback', 'token', [], 'json'),
-            'platformAppLockerLocations' => new Operation('GET', '/app/v1/locker-locations', 'token', ['latitude', 'longitude', 'origin_address_1', 'origin_address_2', 'origin_city', 'origin_province', 'origin_country', 'origin_postcode', 'search', 'limit', 'per_page', 'page', 'north', 'south', 'east', 'west', 'pickup', 'return', 'online', 'available', 'favorite', 'include_status', 'sort'], null),
-            'platformAppLockerShopCatalog' => new Operation('GET', '/app/v1/locker-locations/{locationId}/shop', 'token', ['locale'], null),
-            'platformAppLockerShopCreateOrder' => new Operation('POST', '/app/v1/locker-shop/orders', 'token', [], 'json'),
-            'platformAppLockerShopIssueAccessCode' => new Operation('POST', '/app/v1/locker-shop/access-codes', 'token', [], 'json'),
-            'platformAppLockerShopItems' => new Operation('GET', '/app/v1/locker-shop/items', 'token', ['shelf_id', 'store_id', 'status', 'page', 'per_page'], null),
-            'platformAppLockerShopOpen' => new Operation('POST', '/app/v1/locker-shop/orders/{id}/open', 'token', [], null),
-            'platformAppLockerShopOrder' => new Operation('GET', '/app/v1/locker-shop/orders/{id}', 'token', [], null),
-            'platformAppLockerShopOrders' => new Operation('GET', '/app/v1/locker-shop/orders', 'token', ['scope', 'page', 'per_page'], null),
-            'platformAppLockerShopRefundRequest' => new Operation('POST', '/app/v1/locker-shop/orders/{id}/refund-request', 'token', [], null),
-            'platformAppLockerStorageClaim' => new Operation('POST', '/app/v1/locker-storage/rentals/claim', 'token', [], 'json'),
-            'platformAppLockerStorageDelivery' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/delivery', 'token', [], 'json'),
-            'platformAppLockerStorageKeep' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/keep', 'token', [], null),
-            'platformAppLockerStorageOnwardQuote' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/onward-quote', 'token', [], 'json'),
-            'platformAppLockerStoragePickupSite' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/pickup-site', 'token', [], 'json'),
-            'platformAppLockerStoragePickupSiteCancel' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/pickup-site/cancel', 'token', [], null),
-            'platformAppLockerStorageRental' => new Operation('GET', '/app/v1/locker-storage/rentals/{id}', 'token', [], null),
-            'platformAppLockerStorageRentals' => new Operation('GET', '/app/v1/locker-storage/rentals', 'token', ['scope', 'page', 'per_page'], null),
-            'platformAppLockerStorageResendCode' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/resend-code', 'token', [], null),
-            'platformAppLockerStorageReturnTime' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/return-time', 'token', [], 'json'),
-            'platformAppLockerStorageShipment' => new Operation('POST', '/app/v1/locker-storage/rentals/{id}/shipment', 'token', [], 'json'),
             'platformAppMallCategory' => new Operation('GET', '/app/v1/mall/categories/{categoryId}', 'token', ['page', 'locale'], null),
             'platformAppMallGroupBuys' => new Operation('GET', '/app/v1/mall/group-buys', 'token', ['category', 'locale'], null),
             'platformAppMallHome' => new Operation('GET', '/app/v1/mall/home', 'token', ['locale'], null),
@@ -252,8 +227,6 @@ final class PartnerApi
             'platformAppPayRequest' => new Operation('GET', '/app/v1/pay/requests/{publicToken}', 'token', [], null),
             'platformAppPayResolveLink' => new Operation('POST', '/app/v1/pay/links', 'token', [], 'json'),
             'platformAppPayResolveTag' => new Operation('POST', '/app/v1/pay/resolve', 'token', [], 'json'),
-            'platformAppPickup' => new Operation('GET', '/app/v1/pickups/{deliveryId}', 'token', [], null),
-            'platformAppPickups' => new Operation('GET', '/app/v1/pickups', 'token', ['status', 'per_page', 'page'], null),
             'platformAppPrivacy' => new Operation('GET', '/app/v1/privacy', 'token', [], null),
             'platformAppPublicQuote' => new Operation('POST', '/app/v1/quotes/{line}', 'token', [], 'json'),
             'platformAppPublicQuoteSchema' => new Operation('GET', '/app/v1/quotes/schema', 'token', ['locale'], null),
@@ -292,1747 +265,1571 @@ final class PartnerApi
             'platformAppStoreOrders' => new Operation('GET', '/app/v1/store-orders', 'token', ['scope', 'page', 'per_page', 'include', 'locale'], null),
             'platformAppStoreProduct' => new Operation('GET', '/app/v1/stores/{slug}/products/{productId}', 'token', ['locale'], null),
             'platformAppStorefront' => new Operation('GET', '/app/v1/storefront', 'token', ['locale'], null),
-            'platformAppTakeBackPickup' => new Operation('POST', '/app/v1/pickups/{deliveryId}/handoff/revoke', 'token', [], null),
             'platformAppTrack' => new Operation('POST', '/app/v1/track', 'token', [], 'json'),
-            'platformAppUpdateLockerPreference' => new Operation('PUT', '/app/v1/locker-locations/{locationId}/preference', 'token', [], 'json'),
             'platformAppUpdateNotificationPreferences' => new Operation('PUT', '/app/v1/notifications/preferences', 'token', [], 'json'),
             'platformAppVerifyPhone' => new Operation('POST', '/app/v1/privacy/phone/verify', 'token', [], 'json'),
             'platformAppWallet' => new Operation('GET', '/app/v1/wallet', 'token', ['locale'], null),
-            'platformAppWalletCreateTopUp' => new Operation('POST', '/app/v1/wallet/top-ups', 'token', [], 'json'),
+            'platformAppWalletCreateTopUp' => new Operation('POST', '/app/v1/wallet/top-ups', 'token', [], 'json', ['Idempotency-Key']),
             'platformAppWalletPaymentMethods' => new Operation('GET', '/app/v1/wallet/payment-methods', 'token', ['locale'], null),
             'platformAppWalletTaxPreview' => new Operation('POST', '/app/v1/wallet/tax-preview', 'token', [], 'json'),
             'platformAppWalletTopUpStatus' => new Operation('GET', '/app/v1/wallet/top-ups/{operationId}', 'token', [], null),
             'platformAppWalletTransactions' => new Operation('GET', '/app/v1/wallet/transactions', 'token', ['category', 'status', 'type', 'per_page', 'page'], null),
             'platformAppWithdrawAccountClosure' => new Operation('POST', '/app/v1/account-closure/withdraw', 'key', [], 'json'),
             'uniorder' => new Operation('GET', '/app/v1/uniorder/{orderId}', 'token', [], null),
-            'uniorderCancel' => new Operation('POST', '/app/v1/uniorder/{orderId}/cancel', 'token', [], null),
-            'uniorderCreate' => new Operation('POST', '/app/v1/uniorder', 'token', [], 'json'),
+            'uniorderCancel' => new Operation('POST', '/app/v1/uniorder/{orderId}/cancel', 'token', [], null, ['Idempotency-Key']),
+            'uniorderCreate' => new Operation('POST', '/app/v1/uniorder', 'token', [], 'json', ['Idempotency-Key']),
             'uniorderLabel' => new Operation('GET', '/app/v1/uniorder/{orderId}/label', 'token', ['hide_sender_address', 'hide_receiver_address'], null),
-            'uniorderPurchaseLabel' => new Operation('POST', '/app/v1/uniorder/{orderId}/label', 'token', [], 'json'),
+            'uniorderPurchaseLabel' => new Operation('POST', '/app/v1/uniorder/{orderId}/label', 'token', [], 'json', ['Idempotency-Key']),
             'uniorderRate' => new Operation('POST', '/app/v1/uniorder/rate', 'token', [], 'json'),
             'uniorderTracking' => new Operation('GET', '/app/v1/uniorder/{orderId}/tracking', 'token', [], null),
         ];
     }
 
     /** POST /app/v1/driver/routes/{routeId}/batch-add-orders-by-driver — Batch Add Orders to Route by Driver */
-    public function batchAddOrdersToRouteByDriver(int $routeId, array $body): mixed
+    public function batchAddOrdersToRouteByDriver(int $routeId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['batchAddOrdersToRouteByDriver'], ['routeId' => $routeId], $body, []);
+        return ($this->call)(self::operations()['batchAddOrdersToRouteByDriver'], ['routeId' => $routeId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/routes/cancel — Cancel route by driver */
-    public function cancelRouteByDriver(array $body): mixed
+    public function cancelRouteByDriver(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['cancelRouteByDriver'], [], $body, []);
+        return ($this->call)(self::operations()['cancelRouteByDriver'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/address-by-postcode/{postcode} — GET /app/v1/address-by-postcode/{postcode} */
-    public function customerAddressByPostcodePostcodeGet(string $postcode): mixed
+    public function customerAddressByPostcodePostcodeGet(string $postcode, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerAddressByPostcodePostcodeGet'], ['postcode' => $postcode], null, []);
+        return ($this->call)(self::operations()['customerAddressByPostcodePostcodeGet'], ['postcode' => $postcode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/address-by-postcode/{postcode} — POST /app/v1/address-by-postcode/{postcode?} */
-    public function customerAddressByPostcodePostcodePost(string $postcode): mixed
+    public function customerAddressByPostcodePostcodePost(string $postcode, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerAddressByPostcodePostcodePost'], ['postcode' => $postcode], null, []);
+        return ($this->call)(self::operations()['customerAddressByPostcodePostcodePost'], ['postcode' => $postcode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/deals — GET /app/v1/deals */
-    public function customerDealsGet(): mixed
+    public function customerDealsGet(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerDealsGet'], [], null, []);
+        return ($this->call)(self::operations()['customerDealsGet'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/moving-orders/calculate-price — Calculate the price of a moving order */
-    public function customerMovingOrderCalculatePrice(array $body): mixed
+    public function customerMovingOrderCalculatePrice(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderCalculatePrice'], [], $body, []);
+        return ($this->call)(self::operations()['customerMovingOrderCalculatePrice'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/moving-orders/{id}/cancel — Cancel a moving order */
-    public function customerMovingOrderCancel(int $id): mixed
+    public function customerMovingOrderCancel(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderCancel'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerMovingOrderCancel'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/moving-orders/config — Get the configuration bundle needed to render the customer 'create moving order' form */
-    public function customerMovingOrderConfig(): mixed
+    public function customerMovingOrderConfig(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderConfig'], [], null, []);
+        return ($this->call)(self::operations()['customerMovingOrderConfig'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/moving-orders — Create a moving order */
-    public function customerMovingOrderCreate(array $body): mixed
+    public function customerMovingOrderCreate(array $body, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderCreate'], [], $body, []);
+        return ($this->call)(self::operations()['customerMovingOrderCreate'], ['Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/moving-orders/{id}/pay — Pay a moving order from the wallet balance */
-    public function customerMovingOrderPay(int $id, ?array $body = null): mixed
+    public function customerMovingOrderPay(int $id, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderPay'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerMovingOrderPay'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/moving-orders/{id}/payment-info — Get the payment options of a moving order */
-    public function customerMovingOrderPaymentInfo(int $id): mixed
+    public function customerMovingOrderPaymentInfo(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderPaymentInfo'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerMovingOrderPaymentInfo'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/moving-orders/{id} — Get the detail of one moving order owned by the authenticated customer */
-    public function customerMovingOrderShow(int $id): mixed
+    public function customerMovingOrderShow(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderShow'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerMovingOrderShow'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/moving-orders/{id} — Update a moving order */
-    public function customerMovingOrderUpdate(int $id, array $body): mixed
+    public function customerMovingOrderUpdate(int $id, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrderUpdate'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerMovingOrderUpdate'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/moving-orders — List the authenticated customer's moving orders */
-    public function customerMovingOrders(?string $status = null, ?string $movingDateFrom = null, ?string $movingDateTo = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null): mixed
+    public function customerMovingOrders(?string $status = null, ?string $movingDateFrom = null, ?string $movingDateTo = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerMovingOrders'], ['status' => $status, 'moving_date_from' => $movingDateFrom, 'moving_date_to' => $movingDateTo, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['customerMovingOrders'], ['status' => $status, 'moving_date_from' => $movingDateFrom, 'moving_date_to' => $movingDateTo, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/order-addressbook — GET /app/v1/order-addressbook */
-    public function customerOrderAddressbookGet(): mixed
+    public function customerOrderAddressbookGet(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAddressbookGet'], [], null, []);
+        return ($this->call)(self::operations()['customerOrderAddressbookGet'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** DELETE /app/v1/order-addressbook/{id} — DELETE /app/v1/order-addressbook/{id} */
-    public function customerOrderAddressbookIdDelete(string $id): mixed
+    public function customerOrderAddressbookIdDelete(string $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAddressbookIdDelete'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerOrderAddressbookIdDelete'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/order-addressbook/{id} — GET /app/v1/order-addressbook/{id} */
-    public function customerOrderAddressbookIdGet(string $id): mixed
+    public function customerOrderAddressbookIdGet(string $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAddressbookIdGet'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerOrderAddressbookIdGet'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/order-addressbook/{id} — PUT /app/v1/order-addressbook/{id} */
-    public function customerOrderAddressbookIdPut(string $id): mixed
+    public function customerOrderAddressbookIdPut(string $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAddressbookIdPut'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerOrderAddressbookIdPut'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/order-addressbook — POST /app/v1/order-addressbook */
-    public function customerOrderAddressbookPost(): mixed
+    public function customerOrderAddressbookPost(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAddressbookPost'], [], null, []);
+        return ($this->call)(self::operations()['customerOrderAddressbookPost'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/order-announcements/confirm — POST /app/v1/order-announcements/confirm */
-    public function customerOrderAnnouncementsConfirmPost(): mixed
+    public function customerOrderAnnouncementsConfirmPost(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAnnouncementsConfirmPost'], [], null, []);
+        return ($this->call)(self::operations()['customerOrderAnnouncementsConfirmPost'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/order-announcements — GET /app/v1/order-announcements */
-    public function customerOrderAnnouncementsGet(): mixed
+    public function customerOrderAnnouncementsGet(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerOrderAnnouncementsGet'], [], null, []);
+        return ($this->call)(self::operations()['customerOrderAnnouncementsGet'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/profile — GET /app/v1/profile */
-    public function customerProfileGet(): mixed
+    public function customerProfileGet(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerProfileGet'], [], null, []);
+        return ($this->call)(self::operations()['customerProfileGet'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/profile — POST /app/v1/profile */
-    public function customerProfilePost(): mixed
+    public function customerProfilePost(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerProfilePost'], [], null, []);
+        return ($this->call)(self::operations()['customerProfilePost'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** DELETE /app/v1/saved-form-answers/{formId} — Remove the answers the customer keeps for one order form */
-    public function customerSavedFormAnswersDelete(int $formId): mixed
+    public function customerSavedFormAnswersDelete(int $formId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerSavedFormAnswersDelete'], ['formId' => $formId], null, []);
+        return ($this->call)(self::operations()['customerSavedFormAnswersDelete'], ['formId' => $formId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/saved-form-answers — List the order forms whose answers the customer may keep on their account */
-    public function customerSavedFormAnswersList(): mixed
+    public function customerSavedFormAnswersList(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerSavedFormAnswersList'], [], null, []);
+        return ($this->call)(self::operations()['customerSavedFormAnswersList'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/saved-form-answers/{formId} — Save the answers the customer keeps for one order form */
-    public function customerSavedFormAnswersSave(int $formId, array $body): mixed
+    public function customerSavedFormAnswersSave(int $formId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerSavedFormAnswersSave'], ['formId' => $formId], $body, []);
+        return ($this->call)(self::operations()['customerSavedFormAnswersSave'], ['formId' => $formId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/shipping-orders/{id}/cancel — Cancel a shipping order */
-    public function customerShippingOrderCancel(int $id): mixed
+    public function customerShippingOrderCancel(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderCancel'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerShippingOrderCancel'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/shipping-orders/services/{serviceCode}/orders — Create a shipping order on a service */
-    public function customerShippingOrderCreate(string $serviceCode, array $body): mixed
+    public function customerShippingOrderCreate(string $serviceCode, array $body, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderCreate'], ['serviceCode' => $serviceCode], $body, []);
+        return ($this->call)(self::operations()['customerShippingOrderCreate'], ['serviceCode' => $serviceCode, 'Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/shipping-orders/services/{serviceCode}/estimate-price — Estimate the price of a shipping order on a service */
-    public function customerShippingOrderEstimatePrice(string $serviceCode, ?array $body = null): mixed
+    public function customerShippingOrderEstimatePrice(string $serviceCode, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderEstimatePrice'], ['serviceCode' => $serviceCode], $body, []);
+        return ($this->call)(self::operations()['customerShippingOrderEstimatePrice'], ['serviceCode' => $serviceCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/shipping-orders/{id}/pay — Pay a shipping order from the wallet balance */
-    public function customerShippingOrderPay(int $id, ?array $body = null): mixed
+    public function customerShippingOrderPay(int $id, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderPay'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerShippingOrderPay'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/shipping-orders/{id}/payment-info — Get the payment information of a shipping order */
-    public function customerShippingOrderPaymentInfo(int $id): mixed
+    public function customerShippingOrderPaymentInfo(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderPaymentInfo'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerShippingOrderPaymentInfo'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/shipping-orders/services/{serviceCode}/config — Get the per-service configuration bundle needed to render the 'create shipping order' form */
-    public function customerShippingOrderServiceConfig(string $serviceCode): mixed
+    public function customerShippingOrderServiceConfig(string $serviceCode, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderServiceConfig'], ['serviceCode' => $serviceCode], null, []);
+        return ($this->call)(self::operations()['customerShippingOrderServiceConfig'], ['serviceCode' => $serviceCode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/shipping-orders/services — List shipping services available to the authenticated customer */
-    public function customerShippingOrderServices(): mixed
+    public function customerShippingOrderServices(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderServices'], [], null, []);
+        return ($this->call)(self::operations()['customerShippingOrderServices'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/shipping-orders/{id} — Get the detail of one shipping order owned by the authenticated customer */
-    public function customerShippingOrderShow(int $id): mixed
+    public function customerShippingOrderShow(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderShow'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerShippingOrderShow'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/shipping-orders/{id} — Update a shipping order */
-    public function customerShippingOrderUpdate(int $id, array $body): mixed
+    public function customerShippingOrderUpdate(int $id, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrderUpdate'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerShippingOrderUpdate'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/shipping-orders/services/{serviceCode}/orders — List the authenticated customer's shipping orders under one service */
-    public function customerShippingOrders(string $serviceCode, ?int $status = null, ?string $id = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null): mixed
+    public function customerShippingOrders(string $serviceCode, ?int $status = null, ?string $id = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerShippingOrders'], ['serviceCode' => $serviceCode, 'status' => $status, 'id' => $id, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['customerShippingOrders'], ['serviceCode' => $serviceCode, 'status' => $status, 'id' => $id, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/storage-orders/calculate-price — Calculate the price of a storage order */
-    public function customerStorageOrderCalculatePrice(array $body): mixed
+    public function customerStorageOrderCalculatePrice(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderCalculatePrice'], [], $body, []);
+        return ($this->call)(self::operations()['customerStorageOrderCalculatePrice'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/storage-orders/{id}/cancel — Cancel a storage order */
-    public function customerStorageOrderCancel(int $id): mixed
+    public function customerStorageOrderCancel(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderCancel'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerStorageOrderCancel'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/storage-orders/config — Get the configuration bundle needed to render the customer 'create storage order' form */
-    public function customerStorageOrderConfig(): mixed
+    public function customerStorageOrderConfig(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderConfig'], [], null, []);
+        return ($this->call)(self::operations()['customerStorageOrderConfig'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/storage-orders — Create a storage order */
-    public function customerStorageOrderCreate(array $body): mixed
+    public function customerStorageOrderCreate(array $body, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderCreate'], [], $body, []);
+        return ($this->call)(self::operations()['customerStorageOrderCreate'], ['Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/storage-orders/{id}/pay — Pay a storage order from the wallet balance */
-    public function customerStorageOrderPay(int $id, ?array $body = null): mixed
+    public function customerStorageOrderPay(int $id, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderPay'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerStorageOrderPay'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/storage-orders/{id}/payment-info — Get the payment options of a storage order */
-    public function customerStorageOrderPaymentInfo(int $id): mixed
+    public function customerStorageOrderPaymentInfo(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderPaymentInfo'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerStorageOrderPaymentInfo'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/storage-orders/{id} — Get the detail of one storage order owned by the authenticated customer */
-    public function customerStorageOrderShow(int $id): mixed
+    public function customerStorageOrderShow(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderShow'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['customerStorageOrderShow'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/storage-orders/{id} — Update a storage order */
-    public function customerStorageOrderUpdate(int $id, array $body): mixed
+    public function customerStorageOrderUpdate(int $id, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrderUpdate'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['customerStorageOrderUpdate'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/storage-orders — List the authenticated customer's storage orders */
-    public function customerStorageOrders(?string $status = null, ?int $warehouseId = null, ?string $storeFrom = null, ?string $storeTo = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $quickSearch = null, ?string $id = null, ?string $packageId = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null): mixed
+    public function customerStorageOrders(?string $status = null, ?int $warehouseId = null, ?string $storeFrom = null, ?string $storeTo = null, ?string $createdAtFrom = null, ?string $createdAtTo = null, ?string $quickSearch = null, ?string $id = null, ?string $packageId = null, ?string $sortBy = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['customerStorageOrders'], ['status' => $status, 'warehouse_id' => $warehouseId, 'store_from' => $storeFrom, 'store_to' => $storeTo, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'quick_search' => $quickSearch, 'id' => $id, 'package_id' => $packageId, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['customerStorageOrders'], ['status' => $status, 'warehouse_id' => $warehouseId, 'store_from' => $storeFrom, 'store_to' => $storeTo, 'created_at_from' => $createdAtFrom, 'created_at_to' => $createdAtTo, 'quick_search' => $quickSearch, 'id' => $id, 'package_id' => $packageId, 'sort_by' => $sortBy, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/addGpsTackingRecord — Add Gps Tracking Record */
-    public function driverAddGpsTackingRecord(?array $body = null): mixed
+    public function driverAddGpsTackingRecord(?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverAddGpsTackingRecord'], [], $body, []);
+        return ($this->call)(self::operations()['driverAddGpsTackingRecord'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/orders/{orderId}/accept — Accept an assigned order */
-    public function driverAssignmentRespond(int $orderId): mixed
+    public function driverAssignmentRespond(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverAssignmentRespond'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverAssignmentRespond'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/assignments/pending — Pending auto-assign offers */
-    public function driverAssignmentsPendingGet(): mixed
+    public function driverAssignmentsPendingGet(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverAssignmentsPendingGet'], [], null, []);
+        return ($this->call)(self::operations()['driverAssignmentsPendingGet'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/availability — Current availability (online, heartbeat, load) */
-    public function driverAvailabilityShow(): mixed
+    public function driverAvailabilityShow(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverAvailabilityShow'], [], null, []);
+        return ($this->call)(self::operations()['driverAvailabilityShow'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/availability — Go online/offline or send a heartbeat */
-    public function driverAvailabilityUpdate(?array $body = null): mixed
+    public function driverAvailabilityUpdate(?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverAvailabilityUpdate'], [], $body, []);
+        return ($this->call)(self::operations()['driverAvailabilityUpdate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/batch-update-deliver — POST /app/v1/driver/batch-update-deliver */
-    public function driverBatchUpdateDeliver(array $body, array $files = []): mixed
+    public function driverBatchUpdateDeliver(array $body, array $files = [], ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverBatchUpdateDeliver'], [], $body, $files);
+        return ($this->call)(self::operations()['driverBatchUpdateDeliver'], ['extraQuery' => $extraQuery], $body, $files);
     }
 
     /** POST /app/v1/driver/boards/{id}/bid — Place or lower a bid on a seat of a bid-mode (reverse auction) Route Board */
-    public function driverBoardsIdBidPost(int $id, array $body): mixed
+    public function driverBoardsIdBidPost(int $id, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverBoardsIdBidPost'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['driverBoardsIdBidPost'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/boards/{id}/claim — Claim a seat (route) on a Route Board, or grab a seat on a seat-mode board */
-    public function driverBoardsIdClaimPost(int $id, ?array $body = null): mixed
+    public function driverBoardsIdClaimPost(int $id, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverBoardsIdClaimPost'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['driverBoardsIdClaimPost'], ['id' => $id, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/claims — List your Route Board claims */
-    public function driverClaimsGet(?int $history = null): mixed
+    public function driverClaimsGet(?int $history = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverClaimsGet'], ['history' => $history], null, []);
+        return ($this->call)(self::operations()['driverClaimsGet'], ['history' => $history, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/claims/{id}/withdraw — Withdraw one of your Route Board claims */
-    public function driverClaimsIdWithdrawPost(int $id): mixed
+    public function driverClaimsIdWithdrawPost(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverClaimsIdWithdrawPost'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['driverClaimsIdWithdrawPost'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/create-route — Create a new route by driver */
-    public function driverCreateRoute(?array $body = null): mixed
+    public function driverCreateRoute(?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverCreateRoute'], [], $body, []);
+        return ($this->call)(self::operations()['driverCreateRoute'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/delete-pictures — Delete order picture by orderfile Id */
-    public function driverDeletePictures(array $body): mixed
+    public function driverDeletePictures(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverDeletePictures'], [], $body, []);
+        return ($this->call)(self::operations()['driverDeletePictures'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/duty — Driver duty status and pending offers */
-    public function driverDuty(): mixed
+    public function driverDuty(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverDuty'], [], null, []);
+        return ($this->call)(self::operations()['driverDuty'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/duty — Go on / off duty */
-    public function driverDutyUpdate(array $body): mixed
+    public function driverDutyUpdate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverDutyUpdate'], [], $body, []);
+        return ($this->call)(self::operations()['driverDutyUpdate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/earnings — Driver earnings summary */
-    public function driverEarnings(?string $period = null, ?string $from = null, ?string $to = null): mixed
+    public function driverEarnings(?string $period = null, ?string $from = null, ?string $to = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverEarnings'], ['period' => $period, 'from' => $from, 'to' => $to], null, []);
+        return ($this->call)(self::operations()['driverEarnings'], ['period' => $period, 'from' => $from, 'to' => $to, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/endDelivery — end Delivery By route id */
-    public function driverEndDelivery(array $body): mixed
+    public function driverEndDelivery(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverEndDelivery'], [], $body, []);
+        return ($this->call)(self::operations()['driverEndDelivery'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/firebase/routes/{routeId}/area/{area} — GET /app/v1/driver/firebase/routes/{routeId}/area/{area} */
-    public function driverFirebaseRoutesRouteIdAreaAreaGet(string $routeId, string $area): mixed
+    public function driverFirebaseRoutesRouteIdAreaAreaGet(string $routeId, string $area, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverFirebaseRoutesRouteIdAreaAreaGet'], ['routeId' => $routeId, 'area' => $area], null, []);
+        return ($this->call)(self::operations()['driverFirebaseRoutesRouteIdAreaAreaGet'], ['routeId' => $routeId, 'area' => $area, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/kiosk-receive-package — Scan and receive an awaiting-processing package from kiosk receiving area */
-    public function driverKioskReceivePackage(array $body): mixed
+    public function driverKioskReceivePackage(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverKioskReceivePackage'], [], $body, []);
+        return ($this->call)(self::operations()['driverKioskReceivePackage'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/kiosk-receiving-packages — Get kiosk receiving area package count */
-    public function driverKioskReceivingPackages(int $routeId, int $orderId): mixed
+    public function driverKioskReceivingPackages(int $routeId, int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverKioskReceivingPackages'], ['route_id' => $routeId, 'order_id' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverKioskReceivingPackages'], ['route_id' => $routeId, 'order_id' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/optimize-route — optimize route */
-    public function driverOptimizeRoute(array $body): mixed
+    public function driverOptimizeRoute(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOptimizeRoute'], [], $body, []);
+        return ($this->call)(self::operations()['driverOptimizeRoute'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/ref/{ref} — Find the driver's order by ref, id or tracking number */
-    public function driverOrderByRef(string $ref): mixed
+    public function driverOrderByRef(string $ref, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderByRef'], ['ref' => $ref], null, []);
+        return ($this->call)(self::operations()['driverOrderByRef'], ['ref' => $ref, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/orders/{orderId}/cash-collected — Driver records cash collected on an order (payroll v2) */
-    public function driverOrderCashCollected(int $orderId, array $body): mixed
+    public function driverOrderCashCollected(int $orderId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderCashCollected'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['driverOrderCashCollected'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/orders/{orderId}/chat — Order chat thread (driver view) */
-    public function driverOrderChat(int $orderId, ?int $sinceId = null): mixed
+    public function driverOrderChat(int $orderId, ?int $sinceId = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderChat'], ['orderId' => $orderId, 'since_id' => $sinceId], null, []);
+        return ($this->call)(self::operations()['driverOrderChat'], ['orderId' => $orderId, 'since_id' => $sinceId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/orders/{orderId}/chat — Send a driver message into an order chat */
-    public function driverOrderChatSend(int $orderId, array $body): mixed
+    public function driverOrderChatSend(int $orderId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderChatSend'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['driverOrderChatSend'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/chat/unread — Driver unread chat counters */
-    public function driverOrderChatUnread(): mixed
+    public function driverOrderChatUnread(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderChatUnread'], [], null, []);
+        return ($this->call)(self::operations()['driverOrderChatUnread'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/orders-files/{orderId} — GET /app/v1/driver/orders-files/{orderId} */
-    public function driverOrderFiles(string $orderId): mixed
+    public function driverOrderFiles(string $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderFiles'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverOrderFiles'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/orders/{orderId}/price-detail — Get unified price detail for an order */
-    public function driverOrderPriceDetail(int $orderId): mixed
+    public function driverOrderPriceDetail(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrderPriceDetail'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverOrderPriceDetail'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/orders/{orderId} — Get order by Id */
-    public function driverOrders(int $orderId): mixed
+    public function driverOrders(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrders'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverOrders'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/orders — Get Orders */
-    public function driverOrdersGet(?int $status = null, ?int $id = null, ?int $unassigned = null, ?int $page = null, ?int $pageSize = null): mixed
+    public function driverOrdersGet(?int $status = null, ?int $id = null, ?int $unassigned = null, ?int $page = null, ?int $pageSize = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersGet'], ['status' => $status, 'id' => $id, 'unassigned' => $unassigned, 'page' => $page, 'pageSize' => $pageSize], null, []);
+        return ($this->call)(self::operations()['driverOrdersGet'], ['status' => $status, 'id' => $id, 'unassigned' => $unassigned, 'page' => $page, 'pageSize' => $pageSize, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/orders-notes/{orderId} — Get order notes */
-    public function driverOrdersNotes(int $orderId): mixed
+    public function driverOrdersNotes(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersNotes'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverOrdersNotes'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/orders-notes/create — Create an order note */
-    public function driverOrdersNotesCreate(array $body): mixed
+    public function driverOrdersNotesCreate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersNotesCreate'], [], $body, []);
+        return ($this->call)(self::operations()['driverOrdersNotesCreate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/orders/{orderId}/chat/read — Mark an order chat as read (driver) */
-    public function driverOrdersOrderIdChatReadPost(int $orderId): mixed
+    public function driverOrdersOrderIdChatReadPost(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersOrderIdChatReadPost'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverOrdersOrderIdChatReadPost'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/orders/{orderId}/reject — Reject an assigned order */
-    public function driverOrdersOrderIdRejectPost(int $orderId, ?array $body = null): mixed
+    public function driverOrdersOrderIdRejectPost(int $orderId, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersOrderIdRejectPost'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['driverOrdersOrderIdRejectPost'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** PATCH /app/v1/driver/orders/{orderId}/related-order-items — Update related storage/moving/shipping order items by driver order id */
-    public function driverOrdersOrderIdRelatedOrderItemsPatch(int $orderId, array $body): mixed
+    public function driverOrdersOrderIdRelatedOrderItemsPatch(int $orderId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersOrderIdRelatedOrderItemsPatch'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['driverOrdersOrderIdRelatedOrderItemsPatch'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/orders-status — Get order status list */
-    public function driverOrdersStatus(): mixed
+    public function driverOrdersStatus(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersStatus'], [], null, []);
+        return ($this->call)(self::operations()['driverOrdersStatus'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/orders-status — Update order status */
-    public function driverOrdersStatusPost(array $body): mixed
+    public function driverOrdersStatusPost(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverOrdersStatusPost'], [], $body, []);
+        return ($this->call)(self::operations()['driverOrdersStatusPost'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/packagings — Get packaging types and packagings for the driver's service provider */
-    public function driverPackagingsGet(?string $language = null): mixed
+    public function driverPackagingsGet(?string $language = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverPackagingsGet'], ['language' => $language], null, []);
+        return ($this->call)(self::operations()['driverPackagingsGet'], ['language' => $language, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/pickup-order/{ref} — Pickup scan by order or package identifier */
-    public function driverPickupOrder(string $ref, ?array $body = null): mixed
+    public function driverPickupOrder(string $ref, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverPickupOrder'], ['ref' => $ref], $body, []);
+        return ($this->call)(self::operations()['driverPickupOrder'], ['ref' => $ref, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/pod-requirements — POD requirements at stop completion (driver app) */
-    public function driverPodRequirements(): mixed
+    public function driverPodRequirements(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverPodRequirements'], [], null, []);
+        return ($this->call)(self::operations()['driverPodRequirements'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/pool/orders/{orderId}/claim — Claim a pool order onto today's route */
-    public function driverPoolClaim(int $orderId, ?array $body = null): mixed
+    public function driverPoolClaim(int $orderId, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverPoolClaim'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['driverPoolClaim'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/pool/orders — Regular orders in the driver pool */
-    public function driverPoolOrders(): mixed
+    public function driverPoolOrders(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverPoolOrders'], [], null, []);
+        return ($this->call)(self::operations()['driverPoolOrders'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/profile — get driver profile */
-    public function driverProfileShow(): mixed
+    public function driverProfileShow(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverProfileShow'], [], null, []);
+        return ($this->call)(self::operations()['driverProfileShow'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** PUT /app/v1/driver/profile — update driver profile */
-    public function driverProfileUpdate(array $body): mixed
+    public function driverProfileUpdate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverProfileUpdate'], [], $body, []);
+        return ($this->call)(self::operations()['driverProfileUpdate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/return-reasons/{order_id} — Reasons for a failed stop */
-    public function driverReturnReasons(?int $orderId = null): mixed
+    public function driverReturnReasons(?int $orderId = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverReturnReasons'], ['order_id' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverReturnReasons'], ['order_id' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/boards/{id} — Get one Route Board with its seats */
-    public function driverRouteBoard(int $id): mixed
+    public function driverRouteBoard(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRouteBoard'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['driverRouteBoard'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/boards — List the Route Boards visible to the driver */
-    public function driverRouteBoards(): mixed
+    public function driverRouteBoards(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRouteBoards'], [], null, []);
+        return ($this->call)(self::operations()['driverRouteBoards'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/routes — Get routes for one driver */
-    public function driverRoutes(?int $isProcessing = null, ?int $isHistory = null, ?int $page = null, ?int $perPage = null, ?string $sort = null, ?int $id = null): mixed
+    public function driverRoutes(?int $isProcessing = null, ?int $isHistory = null, ?int $page = null, ?int $perPage = null, ?string $sort = null, ?int $id = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutes'], ['isProcessing' => $isProcessing, 'isHistory' => $isHistory, 'page' => $page, 'per_page' => $perPage, 'sort' => $sort, 'id' => $id], null, []);
+        return ($this->call)(self::operations()['driverRoutes'], ['isProcessing' => $isProcessing, 'isHistory' => $isHistory, 'page' => $page, 'per_page' => $perPage, 'sort' => $sort, 'id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/routes/{routeId}/add-order/{ref} — Add order to route by ref/orderid/trackingnumber */
-    public function driverRoutesAddOrder(int $routeId, string $ref, ?int $optimize = null): mixed
+    public function driverRoutesAddOrder(int $routeId, string $ref, ?int $optimize = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesAddOrder'], ['routeId' => $routeId, 'ref' => $ref, 'optimize' => $optimize], null, []);
+        return ($this->call)(self::operations()['driverRoutesAddOrder'], ['routeId' => $routeId, 'ref' => $ref, 'optimize' => $optimize, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/routes/{routeId}/get-stop-number/{ref} — Get order stop number by ref/orderid/trackingnumber */
-    public function driverRoutesGetStopNumber(int $routeId, string $ref): mixed
+    public function driverRoutesGetStopNumber(int $routeId, string $ref, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesGetStopNumber'], ['routeId' => $routeId, 'ref' => $ref], null, []);
+        return ($this->call)(self::operations()['driverRoutesGetStopNumber'], ['routeId' => $routeId, 'ref' => $ref, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/routes/{routeId}/orders — Get orders on route for one driver */
-    public function driverRoutesOrders(int $routeId, ?string $ids = null, ?int $isHideSuccess = null, ?string $statusType = null): mixed
+    public function driverRoutesOrders(int $routeId, ?string $ids = null, ?int $isHideSuccess = null, ?string $statusType = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesOrders'], ['routeId' => $routeId, 'ids' => $ids, 'isHideSuccess' => $isHideSuccess, 'statusType' => $statusType], null, []);
+        return ($this->call)(self::operations()['driverRoutesOrders'], ['routeId' => $routeId, 'ids' => $ids, 'isHideSuccess' => $isHideSuccess, 'statusType' => $statusType, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/routes/{routeId}/orders/batchremove — Batch remove orders from a route */
-    public function driverRoutesOrdersBatchremove(int $routeId, array $body): mixed
+    public function driverRoutesOrdersBatchremove(int $routeId, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesOrdersBatchremove'], ['routeId' => $routeId], $body, []);
+        return ($this->call)(self::operations()['driverRoutesOrdersBatchremove'], ['routeId' => $routeId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/routes/{routeId}/orders/{orderId}/remove — Remove order from route by orderId */
-    public function driverRoutesOrdersRemove(int $routeId, int $orderId): mixed
+    public function driverRoutesOrdersRemove(int $routeId, int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesOrdersRemove'], ['routeId' => $routeId, 'orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['driverRoutesOrdersRemove'], ['routeId' => $routeId, 'orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/routes/{routeId}/points — Get points on route for one driver */
-    public function driverRoutesPoints(int $routeId): mixed
+    public function driverRoutesPoints(int $routeId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesPoints'], ['routeId' => $routeId], null, []);
+        return ($this->call)(self::operations()['driverRoutesPoints'], ['routeId' => $routeId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/routes/validate-order — Validate if ref matches order_id */
-    public function driverRoutesValidateOrder(array $body): mixed
+    public function driverRoutesValidateOrder(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverRoutesValidateOrder'], [], $body, []);
+        return ($this->call)(self::operations()['driverRoutesValidateOrder'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/sms/fail-content/order/{id} — Delivery failed message text for an order */
-    public function driverSmsFailContent(int $id): mixed
+    public function driverSmsFailContent(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverSmsFailContent'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['driverSmsFailContent'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/sms/success-content/order/{id} — Delivered message text for an order */
-    public function driverSmsSuccessContent(int $id): mixed
+    public function driverSmsSuccessContent(int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverSmsSuccessContent'], ['id' => $id], null, []);
+        return ($this->call)(self::operations()['driverSmsSuccessContent'], ['id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/sms/template/{templateId}/order/{id} — Message text of a template for an order */
-    public function driverSmsTemplateContent(int $templateId, int $id): mixed
+    public function driverSmsTemplateContent(int $templateId, int $id, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverSmsTemplateContent'], ['templateId' => $templateId, 'id' => $id], null, []);
+        return ($this->call)(self::operations()['driverSmsTemplateContent'], ['templateId' => $templateId, 'id' => $id, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/driver/sms/templates — GET /app/v1/driver/sms/templates */
-    public function driverSmsTemplates(): mixed
+    public function driverSmsTemplates(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverSmsTemplates'], [], null, []);
+        return ($this->call)(self::operations()['driverSmsTemplates'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/startDelivery — start Delivery By route id */
-    public function driverStartDelivery(array $body): mixed
+    public function driverStartDelivery(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverStartDelivery'], [], $body, []);
+        return ($this->call)(self::operations()['driverStartDelivery'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/driver/unit-mappings — Get dimension and weight unit mappings */
-    public function driverUnitMappingsGet(?string $language = null): mixed
+    public function driverUnitMappingsGet(?string $language = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverUnitMappingsGet'], ['language' => $language], null, []);
+        return ($this->call)(self::operations()['driverUnitMappingsGet'], ['language' => $language, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/driver/update-deliver — POST /app/v1/driver/update-deliver */
-    public function driverUpdateDeliver(array $body, array $files = []): mixed
+    public function driverUpdateDeliver(array $body, array $files = [], ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverUpdateDeliver'], [], $body, $files);
+        return ($this->call)(self::operations()['driverUpdateDeliver'], ['extraQuery' => $extraQuery], $body, $files);
     }
 
     /** POST /app/v1/driver/upload-pictures — Upload order picture */
-    public function driverUploadPictures(array $body): mixed
+    public function driverUploadPictures(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverUploadPictures'], [], $body, []);
+        return ($this->call)(self::operations()['driverUploadPictures'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/driver/upload-pictures-from-urls — POST /app/v1/driver/upload-pictures-from-urls */
-    public function driverUploadPicturesFromUrlsPost(): mixed
+    public function driverUploadPicturesFromUrlsPost(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['driverUploadPicturesFromUrlsPost'], [], null, []);
+        return ($this->call)(self::operations()['driverUploadPicturesFromUrlsPost'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/health — Surface status */
-    public function health(): mixed
+    public function health(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['health'], [], null, []);
+        return ($this->call)(self::operations()['health'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/driver/register — Sign up a driver */
-    public function partnerAppDriverRegister(array $body, ?string $clientCode = null): mixed
+    public function partnerAppDriverRegister(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['partnerAppDriverRegister'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['partnerAppDriverRegister'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/me — Who the token speaks for */
-    public function partnerAppMe(): mixed
+    public function partnerAppMe(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['partnerAppMe'], [], null, []);
+        return ($this->call)(self::operations()['partnerAppMe'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** DELETE /app/v1/sessions/{sessionId} — End one sign-in */
-    public function partnerAppRevokeSession(string $sessionId): mixed
+    public function partnerAppRevokeSession(string $sessionId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['partnerAppRevokeSession'], ['sessionId' => $sessionId], null, []);
+        return ($this->call)(self::operations()['partnerAppRevokeSession'], ['sessionId' => $sessionId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/sessions — List the person's sign-ins to this app */
-    public function partnerAppSessions(): mixed
+    public function partnerAppSessions(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['partnerAppSessions'], [], null, []);
+        return ($this->call)(self::operations()['partnerAppSessions'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/bootstrap — Bootstrap a client-assigned app */
-    public function platformAppBootstrap(?string $clientCode = null, ?string $platform = null, ?string $appVersion = null): mixed
+    public function platformAppBootstrap(?string $clientCode = null, ?string $platform = null, ?string $appVersion = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppBootstrap'], ['clientCode' => $clientCode, 'platform' => $platform, 'app_version' => $appVersion], null, []);
+        return ($this->call)(self::operations()['platformAppBootstrap'], ['clientCode' => $clientCode, 'platform' => $platform, 'app_version' => $appVersion, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** DELETE /app/v1/privacy/account-deletion — Cancel app account deletion */
-    public function platformAppCancelAccountDeletion(): mixed
+    public function platformAppCancelAccountDeletion(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppCancelAccountDeletion'], [], null, []);
+        return ($this->call)(self::operations()['platformAppCancelAccountDeletion'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/returns/{returnId}/cancel — Cancel a customer return request */
-    public function platformAppCancelReturn(int $returnId): mixed
+    public function platformAppCancelReturn(int $returnId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppCancelReturn'], ['returnId' => $returnId], null, []);
-    }
-
-    /** POST /app/v1/pickups/{deliveryId}/collect — Collect and remotely open a locker pickup */
-    public function platformAppCollectPickup(int $deliveryId, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppCollectPickup'], ['deliveryId' => $deliveryId], $body, []);
+        return ($this->call)(self::operations()['platformAppCancelReturn'], ['returnId' => $returnId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/registration-details — Fill in the registration details */
-    public function platformAppCompleteRegistration(array $body): mixed
+    public function platformAppCompleteRegistration(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppCompleteRegistration'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppCompleteRegistration'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/returns — Create a customer return request */
-    public function platformAppCreateReturn(array $body): mixed
+    public function platformAppCreateReturn(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppCreateReturn'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppCreateReturn'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/group-buys/{code} — Get a group buy campaign */
-    public function platformAppGroupBuy(string $code, ?string $leader = null, ?string $locale = null): mixed
+    public function platformAppGroupBuy(string $code, ?string $leader = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuy'], ['code' => $code, 'leader' => $leader, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuy'], ['code' => $code, 'leader' => $leader, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buys/{code}/address/details — Get a suggested address */
-    public function platformAppGroupBuyAddressDetails(string $code, string $placeId, ?string $session = null): mixed
+    public function platformAppGroupBuyAddressDetails(string $code, string $placeId, ?string $session = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyAddressDetails'], ['code' => $code, 'place_id' => $placeId, 'session' => $session], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyAddressDetails'], ['code' => $code, 'place_id' => $placeId, 'session' => $session, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buys/{code}/address/suggestions — Suggest home addresses */
-    public function platformAppGroupBuyAddressSuggestions(string $code, string $q, ?string $session = null): mixed
+    public function platformAppGroupBuyAddressSuggestions(string $code, string $q, ?string $session = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyAddressSuggestions'], ['code' => $code, 'q' => $q, 'session' => $session], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyAddressSuggestions'], ['code' => $code, 'q' => $q, 'session' => $session, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buy-orders/{token}/confirm-payment — Confirm a group buy card hold */
-    public function platformAppGroupBuyConfirmPayment(string $token, ?string $locale = null): mixed
+    public function platformAppGroupBuyConfirmPayment(string $token, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyConfirmPayment'], ['token' => $token, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyConfirmPayment'], ['token' => $token, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buys/{code}/lead — Get leading a group buy */
-    public function platformAppGroupBuyLead(string $code, ?string $locale = null): mixed
+    public function platformAppGroupBuyLead(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLead'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLead'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buys/{code}/lead — Apply to lead a group buy */
-    public function platformAppGroupBuyLeadApply(string $code, array $body, ?string $locale = null): mixed
+    public function platformAppGroupBuyLeadApply(string $code, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeadApply'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeadApply'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/group-buys/{code}/lead/open — Open a group buy group */
-    public function platformAppGroupBuyLeadOpen(string $code, ?string $locale = null): mixed
+    public function platformAppGroupBuyLeadOpen(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeadOpen'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeadOpen'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buys/{code}/lead/start — Start a campaign from a self-pick plan */
-    public function platformAppGroupBuyLeadStart(string $code, array $body, ?string $locale = null): mixed
+    public function platformAppGroupBuyLeadStart(string $code, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeadStart'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeadStart'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/group-buy-leading — List the groups I lead */
-    public function platformAppGroupBuyLeading(?string $locale = null): mixed
+    public function platformAppGroupBuyLeading(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeading'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeading'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buy-leading/{groupId}/orders/{orderId}/collected — Mark a household collected */
-    public function platformAppGroupBuyLeadingCollected(int $groupId, int $orderId, ?string $locale = null): mixed
+    public function platformAppGroupBuyLeadingCollected(int $groupId, int $orderId, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeadingCollected'], ['groupId' => $groupId, 'orderId' => $orderId, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeadingCollected'], ['groupId' => $groupId, 'orderId' => $orderId, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buy-leading/{groupId} — Get a group I lead */
-    public function platformAppGroupBuyLeadingGroup(int $groupId, ?string $locale = null): mixed
+    public function platformAppGroupBuyLeadingGroup(int $groupId, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyLeadingGroup'], ['groupId' => $groupId, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyLeadingGroup'], ['groupId' => $groupId, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buy-orders/{token} — Get a group buy order */
-    public function platformAppGroupBuyOrder(string $token, ?string $locale = null): mixed
+    public function platformAppGroupBuyOrder(string $token, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyOrder'], ['token' => $token, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyOrder'], ['token' => $token, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buy-orders/{token}/pay — Resume a group buy card hold */
-    public function platformAppGroupBuyOrderPay(string $token, ?string $locale = null): mixed
+    public function platformAppGroupBuyOrderPay(string $token, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyOrderPay'], ['token' => $token, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyOrderPay'], ['token' => $token, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buy-orders/{token}/received — Mark a group buy order received */
-    public function platformAppGroupBuyOrderReceived(string $token, ?string $locale = null): mixed
+    public function platformAppGroupBuyOrderReceived(string $token, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyOrderReceived'], ['token' => $token, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyOrderReceived'], ['token' => $token, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/group-buy-orders — List my group buy orders */
-    public function platformAppGroupBuyOrders(?int $page = null, ?int $perPage = null, ?string $locale = null): mixed
+    public function platformAppGroupBuyOrders(?int $page = null, ?int $perPage = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyOrders'], ['page' => $page, 'per_page' => $perPage, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyOrders'], ['page' => $page, 'per_page' => $perPage, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/group-buys/{code}/order — Place a group buy order */
-    public function platformAppGroupBuyPlaceOrder(string $code, array $body, ?string $locale = null): mixed
+    public function platformAppGroupBuyPlaceOrder(string $code, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyPlaceOrder'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyPlaceOrder'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/group-buys/{code}/quote — Price a group buy order */
-    public function platformAppGroupBuyQuote(string $code, array $body, ?string $locale = null): mixed
+    public function platformAppGroupBuyQuote(string $code, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGroupBuyQuote'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGroupBuyQuote'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/guest/clients — List the providers a visitor may use without signing in */
-    public function platformAppGuestClients(?string $locale = null): mixed
+    public function platformAppGuestClients(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestClients'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestClients'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/group-buys/{code} — Get a group buy campaign as a guest */
-    public function platformAppGuestGroupBuy(string $code, ?string $clientCode = null, ?string $leader = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuy(string $code, ?string $clientCode = null, ?string $leader = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuy'], ['code' => $code, 'clientCode' => $clientCode, 'leader' => $leader, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuy'], ['code' => $code, 'clientCode' => $clientCode, 'leader' => $leader, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/group-buys/{code}/address/details — Get a suggested address for a guest */
-    public function platformAppGuestGroupBuyAddressDetails(string $code, string $placeId, ?string $clientCode = null, ?string $session = null): mixed
+    public function platformAppGuestGroupBuyAddressDetails(string $code, string $placeId, ?string $clientCode = null, ?string $session = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyAddressDetails'], ['code' => $code, 'place_id' => $placeId, 'clientCode' => $clientCode, 'session' => $session], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyAddressDetails'], ['code' => $code, 'place_id' => $placeId, 'clientCode' => $clientCode, 'session' => $session, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/group-buys/{code}/address/suggestions — Suggest home addresses to a guest */
-    public function platformAppGuestGroupBuyAddressSuggestions(string $code, string $q, ?string $clientCode = null, ?string $session = null): mixed
+    public function platformAppGuestGroupBuyAddressSuggestions(string $code, string $q, ?string $clientCode = null, ?string $session = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyAddressSuggestions'], ['code' => $code, 'q' => $q, 'clientCode' => $clientCode, 'session' => $session], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyAddressSuggestions'], ['code' => $code, 'q' => $q, 'clientCode' => $clientCode, 'session' => $session, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buy-orders/{token}/confirm-payment — Confirm a guest group buy card hold */
-    public function platformAppGuestGroupBuyConfirmPayment(string $token, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyConfirmPayment(string $token, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyConfirmPayment'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyConfirmPayment'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/group-buy-orders/{token} — Get a guest group buy order */
-    public function platformAppGuestGroupBuyOrder(string $token, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyOrder(string $token, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrder'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrder'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buy-orders/{token}/pay — Resume a guest group buy card hold */
-    public function platformAppGuestGroupBuyOrderPay(string $token, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyOrderPay(string $token, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrderPay'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrderPay'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buy-orders/{token}/received — Mark a guest group buy order received */
-    public function platformAppGuestGroupBuyOrderReceived(string $token, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyOrderReceived(string $token, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrderReceived'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrderReceived'], ['token' => $token, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/group-buy-orders — List a guest's group buy orders */
-    public function platformAppGuestGroupBuyOrders(?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyOrders(?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrders'], ['clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyOrders'], ['clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buys/{code}/order — Place a guest group buy order */
-    public function platformAppGuestGroupBuyPlaceOrder(string $code, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyPlaceOrder(string $code, array $body, ?string $clientCode = null, ?string $locale = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyPlaceOrder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyPlaceOrder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buys/{code}/quote — Price a guest group buy order */
-    public function platformAppGuestGroupBuyQuote(string $code, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyQuote(string $code, array $body, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyQuote'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyQuote'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buys/{code}/verify/complete — Verify a group buy guest's code */
-    public function platformAppGuestGroupBuyVerifyComplete(string $code, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyVerifyComplete(string $code, array $body, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyVerifyComplete'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyVerifyComplete'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/group-buys/{code}/verify/request — Send a group buy guest a code */
-    public function platformAppGuestGroupBuyVerifyRequest(string $code, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestGroupBuyVerifyRequest(string $code, array $body, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestGroupBuyVerifyRequest'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestGroupBuyVerifyRequest'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/links/resolve — What a scanned link of the client opens in the app, without signing in */
-    public function platformAppGuestLinkResolve(string $url, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestLinkResolve(string $url, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestLinkResolve'], ['url' => $url, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestLinkResolve'], ['url' => $url, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/mall/categories/{categoryId} — Mall category products (guest) */
-    public function platformAppGuestMallCategory(int $categoryId, ?string $clientCode = null, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppGuestMallCategory(int $categoryId, ?string $clientCode = null, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestMallCategory'], ['categoryId' => $categoryId, 'clientCode' => $clientCode, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestMallCategory'], ['categoryId' => $categoryId, 'clientCode' => $clientCode, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/mall/group-buys — Group buy channel (guest) */
-    public function platformAppGuestMallGroupBuys(?string $clientCode = null, ?int $category = null, ?string $locale = null): mixed
+    public function platformAppGuestMallGroupBuys(?string $clientCode = null, ?int $category = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestMallGroupBuys'], ['clientCode' => $clientCode, 'category' => $category, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestMallGroupBuys'], ['clientCode' => $clientCode, 'category' => $category, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/mall/home — Mall home blocks (guest) */
-    public function platformAppGuestMallHome(?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestMallHome(?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestMallHome'], ['clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestMallHome'], ['clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/mall/search — Mall search (guest) */
-    public function platformAppGuestMallSearch(?string $clientCode = null, ?string $q = null, ?string $locale = null): mixed
+    public function platformAppGuestMallSearch(?string $clientCode = null, ?string $q = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestMallSearch'], ['clientCode' => $clientCode, 'q' => $q, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestMallSearch'], ['clientCode' => $clientCode, 'q' => $q, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/mall/stores — Store directory (guest) */
-    public function platformAppGuestMallStores(?string $clientCode = null, ?string $type = null, ?string $tag = null, ?string $q = null, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppGuestMallStores(?string $clientCode = null, ?string $type = null, ?string $tag = null, ?string $q = null, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestMallStores'], ['clientCode' => $clientCode, 'type' => $type, 'tag' => $tag, 'q' => $q, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestMallStores'], ['clientCode' => $clientCode, 'type' => $type, 'tag' => $tag, 'q' => $q, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/shipments/{guestOrderId} — Get a guest shipment */
-    public function platformAppGuestShipment(int $guestOrderId, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestShipment(int $guestOrderId, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipment'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestShipment'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/cancel — Cancel a guest shipment */
-    public function platformAppGuestShipmentCancel(int $guestOrderId, ?string $clientCode = null): mixed
+    public function platformAppGuestShipmentCancel(int $guestOrderId, ?string $clientCode = null, ?string $guestOrderToken = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipmentCancel'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode], null, []);
+        return ($this->call)(self::operations()['platformAppGuestShipmentCancel'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode, 'X-Guest-Order-Token' => $guestOrderToken, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/shipments/{guestOrderId}/label — Get the label of a guest shipment */
-    public function platformAppGuestShipmentLabel(int $guestOrderId, ?string $clientCode = null): mixed
+    public function platformAppGuestShipmentLabel(int $guestOrderId, ?string $clientCode = null, ?string $guestOrderToken = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipmentLabel'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode], null, []);
+        return ($this->call)(self::operations()['platformAppGuestShipmentLabel'], ['guestOrderId' => $guestOrderId, 'clientCode' => $clientCode, 'X-Guest-Order-Token' => $guestOrderToken, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/shipments/rate — Price a guest shipment */
-    public function platformAppGuestShipmentRate(array $body, ?string $clientCode = null): mixed
+    public function platformAppGuestShipmentRate(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipmentRate'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestShipmentRate'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/shipments — Submit a guest shipment for payment */
-    public function platformAppGuestShipmentSubmit(array $body, ?string $clientCode = null): mixed
+    public function platformAppGuestShipmentSubmit(array $body, ?string $clientCode = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipmentSubmit'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestShipmentSubmit'], ['clientCode' => $clientCode, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/shipments — List a verified contact's guest shipments */
-    public function platformAppGuestShipments(?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestShipments(?string $clientCode = null, ?string $locale = null, ?string $guestContactToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestShipments'], ['clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestShipments'], ['clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Contact-Token' => $guestContactToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/stores/{slug} — Store page (guest) */
-    public function platformAppGuestStore(string $slug, ?string $clientCode = null, ?string $q = null, ?int $cat = null, ?string $sort = null, ?string $table = null, ?string $locale = null): mixed
+    public function platformAppGuestStore(string $slug, ?string $clientCode = null, ?string $q = null, ?int $cat = null, ?string $sort = null, ?string $table = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStore'], ['slug' => $slug, 'clientCode' => $clientCode, 'q' => $q, 'cat' => $cat, 'sort' => $sort, 'table' => $table, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStore'], ['slug' => $slug, 'clientCode' => $clientCode, 'q' => $q, 'cat' => $cat, 'sort' => $sort, 'table' => $table, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/stores/{slug}/cart — Cart of one store (guest) */
-    public function platformAppGuestStoreCart(string $slug, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreCart(string $slug, ?string $clientCode = null, ?string $locale = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCart'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCart'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items — Add to cart (guest) */
-    public function platformAppGuestStoreCartAdd(string $slug, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreCartAdd(string $slug, array $body, ?string $clientCode = null, ?string $locale = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCartAdd'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCartAdd'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** DELETE /app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId} — Remove a cart line (guest) */
-    public function platformAppGuestStoreCartRemove(string $slug, int $itemId, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreCartRemove(string $slug, int $itemId, ?string $clientCode = null, ?string $locale = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCartRemove'], ['slug' => $slug, 'itemId' => $itemId, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCartRemove'], ['slug' => $slug, 'itemId' => $itemId, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PATCH /app/v1/clients/{clientCode}/guest/stores/{slug}/cart/items/{itemId} — Change a cart line quantity (guest) */
-    public function platformAppGuestStoreCartUpdate(string $slug, int $itemId, array $body, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreCartUpdate(string $slug, int $itemId, array $body, ?string $clientCode = null, ?string $locale = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCartUpdate'], ['slug' => $slug, 'itemId' => $itemId, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCartUpdate'], ['slug' => $slug, 'itemId' => $itemId, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/stores/{slug}/categories/{categoryId} — Store category page (multi-page style) (guest) */
-    public function platformAppGuestStoreCategory(string $slug, int $categoryId, ?string $clientCode = null, ?string $sort = null, ?int $sub = null, ?bool $inStock = null, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreCategory(string $slug, int $categoryId, ?string $clientCode = null, ?string $sort = null, ?int $sub = null, ?bool $inStock = null, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCategory'], ['slug' => $slug, 'categoryId' => $categoryId, 'clientCode' => $clientCode, 'sort' => $sort, 'sub' => $sub, 'in_stock' => $inStock, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCategory'], ['slug' => $slug, 'categoryId' => $categoryId, 'clientCode' => $clientCode, 'sort' => $sort, 'sub' => $sub, 'in_stock' => $inStock, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/place — Place a guest order where the store takes guest orders (or at a table) */
-    public function platformAppGuestStoreCheckoutPlace(string $slug, ?string $clientCode = null, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppGuestStoreCheckoutPlace(string $slug, ?string $clientCode = null, ?string $locale = null, ?array $body = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCheckoutPlace'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCheckoutPlace'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/stores/{slug}/checkout/quote — Price a guest's cart at a store */
-    public function platformAppGuestStoreCheckoutQuote(string $slug, ?string $clientCode = null, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppGuestStoreCheckoutQuote(string $slug, ?string $clientCode = null, ?string $locale = null, ?array $body = null, ?string $guestCartToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreCheckoutQuote'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreCheckoutQuote'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/stores/{slug}/home — Store home page (multi-page style) (guest) */
-    public function platformAppGuestStoreHome(string $slug, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreHome(string $slug, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreHome'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreHome'], ['slug' => $slug, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/store-orders/{code} — One guest store order, with its order token */
-    public function platformAppGuestStoreOrder(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrder(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/cancel — Cancel a guest order before the store accepts it */
-    public function platformAppGuestStoreOrderCancel(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderCancel(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderCancel'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderCancel'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/confirm-payment — After the PaymentSheet, for a guest order */
-    public function platformAppGuestStoreOrderConfirmPayment(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderConfirmPayment(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderConfirmPayment'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderConfirmPayment'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-open — Open the next door of a guest's paid locker pickup */
-    public function platformAppGuestStoreOrderLockerOpen(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderLockerOpen(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderLockerOpen'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderLockerOpen'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/locker-refund — Refund a guest's locker pickup whose door never opened */
-    public function platformAppGuestStoreOrderLockerRefund(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderLockerRefund(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderLockerRefund'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderLockerRefund'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/pay — Pay a guest order whose payment was left unfinished */
-    public function platformAppGuestStoreOrderPay(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderPay(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderPay'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderPay'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/reorder — Put a guest order's lines back into the guest cart */
-    public function platformAppGuestStoreOrderReorder(string $code, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreOrderReorder(string $code, ?string $clientCode = null, ?string $locale = null, ?string $guestCartToken = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderReorder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderReorder'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Cart-Token' => $guestCartToken, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/return — Ask the store to take a guest's paid or completed order back */
-    public function platformAppGuestStoreOrderReturn(string $code, ?string $clientCode = null, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppGuestStoreOrderReturn(string $code, ?string $clientCode = null, ?string $locale = null, ?array $body = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderReturn'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderReturn'], ['code' => $code, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/store-orders/{code}/review/{productId} — Rate one product of a guest order */
-    public function platformAppGuestStoreOrderReview(string $code, int $productId, ?string $clientCode = null, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppGuestStoreOrderReview(string $code, int $productId, ?string $clientCode = null, ?string $locale = null, ?array $body = null, ?string $guestOrderToken = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreOrderReview'], ['code' => $code, 'productId' => $productId, 'clientCode' => $clientCode, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreOrderReview'], ['code' => $code, 'productId' => $productId, 'clientCode' => $clientCode, 'locale' => $locale, 'X-Guest-Order-Token' => $guestOrderToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/stores/{slug}/products/{productId} — Product page (guest) */
-    public function platformAppGuestStoreProduct(string $slug, int $productId, ?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStoreProduct(string $slug, int $productId, ?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/guest/storefront — Storefront entry (guest) */
-    public function platformAppGuestStorefront(?string $clientCode = null, ?string $locale = null): mixed
+    public function platformAppGuestStorefront(?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestStorefront'], ['clientCode' => $clientCode, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppGuestStorefront'], ['clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/track — Track any code (guest) */
-    public function platformAppGuestTrack(array $body, ?string $clientCode = null): mixed
+    public function platformAppGuestTrack(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestTrack'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestTrack'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/verify/complete — Check a guest verification code */
-    public function platformAppGuestVerifyComplete(array $body, ?string $clientCode = null): mixed
+    public function platformAppGuestVerifyComplete(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestVerifyComplete'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestVerifyComplete'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/guest/verify/request — Send a guest a verification code */
-    public function platformAppGuestVerifyRequest(array $body, ?string $clientCode = null): mixed
+    public function platformAppGuestVerifyRequest(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppGuestVerifyRequest'], ['clientCode' => $clientCode], $body, []);
-    }
-
-    /** POST /app/v1/pickups/{deliveryId}/handoff — Hand a locker pickup to somebody else */
-    public function platformAppHandOverPickup(int $deliveryId, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppHandOverPickup'], ['deliveryId' => $deliveryId], $body, []);
+        return ($this->call)(self::operations()['platformAppGuestVerifyRequest'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/home — App home screen summary */
-    public function platformAppHome(?float $latitude = null, ?float $longitude = null): mixed
+    public function platformAppHome(?float $latitude = null, ?float $longitude = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppHome'], ['latitude' => $latitude, 'longitude' => $longitude], null, []);
+        return ($this->call)(self::operations()['platformAppHome'], ['latitude' => $latitude, 'longitude' => $longitude, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/links/resolve — What a scanned link of the client opens in the app */
-    public function platformAppLinkResolve(string $url, ?string $locale = null): mixed
+    public function platformAppLinkResolve(string $url, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppLinkResolve'], ['url' => $url, 'locale' => $locale], null, []);
-    }
-
-    /** GET /app/v1/locker-locations/{locationId} — Show a SmartLocker location */
-    public function platformAppLockerLocation(int $locationId, ?float $latitude = null, ?float $longitude = null, ?string $originAddress1 = null, ?string $originAddress2 = null, ?string $originCity = null, ?string $originProvince = null, ?string $originCountry = null, ?string $originPostcode = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerLocation'], ['locationId' => $locationId, 'latitude' => $latitude, 'longitude' => $longitude, 'origin_address_1' => $originAddress1, 'origin_address_2' => $originAddress2, 'origin_city' => $originCity, 'origin_province' => $originProvince, 'origin_country' => $originCountry, 'origin_postcode' => $originPostcode], null, []);
-    }
-
-    /** GET /app/v1/locker-locations/{locationId}/guide — Indoor directions to the lockers of a location */
-    public function platformAppLockerLocationGuide(int $locationId): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerLocationGuide'], ['locationId' => $locationId], null, []);
-    }
-
-    /** POST /app/v1/locker-locations/{locationId}/guide/feedback — Answer whether the lockers were found */
-    public function platformAppLockerLocationGuideFeedback(int $locationId, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerLocationGuideFeedback'], ['locationId' => $locationId], $body, []);
-    }
-
-    /** GET /app/v1/locker-locations — List app-enabled SmartLocker locations */
-    public function platformAppLockerLocations(?float $latitude = null, ?float $longitude = null, ?string $originAddress1 = null, ?string $originAddress2 = null, ?string $originCity = null, ?string $originProvince = null, ?string $originCountry = null, ?string $originPostcode = null, ?string $search = null, ?int $limit = null, ?int $perPage = null, ?int $page = null, ?float $north = null, ?float $south = null, ?float $east = null, ?float $west = null, ?bool $pickup = null, ?bool $return = null, ?bool $online = null, ?bool $available = null, ?bool $favorite = null, ?bool $includeStatus = null, ?string $sort = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerLocations'], ['latitude' => $latitude, 'longitude' => $longitude, 'origin_address_1' => $originAddress1, 'origin_address_2' => $originAddress2, 'origin_city' => $originCity, 'origin_province' => $originProvince, 'origin_country' => $originCountry, 'origin_postcode' => $originPostcode, 'search' => $search, 'limit' => $limit, 'per_page' => $perPage, 'page' => $page, 'north' => $north, 'south' => $south, 'east' => $east, 'west' => $west, 'pickup' => $pickup, 'return' => $return, 'online' => $online, 'available' => $available, 'favorite' => $favorite, 'include_status' => $includeStatus, 'sort' => $sort], null, []);
-    }
-
-    /** GET /app/v1/locker-locations/{locationId}/shop — What a location's cabinets have for sale */
-    public function platformAppLockerShopCatalog(int $locationId, ?string $locale = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopCatalog'], ['locationId' => $locationId, 'locale' => $locale], null, []);
-    }
-
-    /** POST /app/v1/locker-shop/orders — Buy from a cabinet */
-    public function platformAppLockerShopCreateOrder(array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopCreateOrder'], [], $body, []);
-    }
-
-    /** POST /app/v1/locker-shop/access-codes — Issue a staff code (merchant staff) */
-    public function platformAppLockerShopIssueAccessCode(array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopIssueAccessCode'], [], $body, []);
-    }
-
-    /** GET /app/v1/locker-shop/items — Items in cells (merchant staff) */
-    public function platformAppLockerShopItems(?int $shelfId = null, ?int $storeId = null, ?string $status = null, ?int $page = null, ?int $perPage = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopItems'], ['shelf_id' => $shelfId, 'store_id' => $storeId, 'status' => $status, 'page' => $page, 'per_page' => $perPage], null, []);
-    }
-
-    /** POST /app/v1/locker-shop/orders/{id}/open — Open the next door */
-    public function platformAppLockerShopOpen(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopOpen'], ['id' => $id], null, []);
-    }
-
-    /** GET /app/v1/locker-shop/orders/{id} — One shop purchase */
-    public function platformAppLockerShopOrder(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopOrder'], ['id' => $id], null, []);
-    }
-
-    /** GET /app/v1/locker-shop/orders — The caller's shop purchases */
-    public function platformAppLockerShopOrders(?string $scope = null, ?int $page = null, ?int $perPage = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopOrders'], ['scope' => $scope, 'page' => $page, 'per_page' => $perPage], null, []);
-    }
-
-    /** POST /app/v1/locker-shop/orders/{id}/refund-request — Ask for a refund after a door would not open */
-    public function platformAppLockerShopRefundRequest(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerShopRefundRequest'], ['id' => $id], null, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/claim — Add a stored bag by its code */
-    public function platformAppLockerStorageClaim(array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageClaim'], [], $body, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/delivery — Have the bag delivered to an address */
-    public function platformAppLockerStorageDelivery(int $id, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageDelivery'], ['id' => $id], $body, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/keep — Keep the bag in its compartment */
-    public function platformAppLockerStorageKeep(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageKeep'], ['id' => $id], null, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/onward-quote — Price delivery and shipment to an address */
-    public function platformAppLockerStorageOnwardQuote(int $id, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageOnwardQuote'], ['id' => $id], $body, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/pickup-site — Collect at another cabinet */
-    public function platformAppLockerStoragePickupSite(int $id, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStoragePickupSite'], ['id' => $id], $body, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/pickup-site/cancel — Collect where the bag is after all */
-    public function platformAppLockerStoragePickupSiteCancel(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStoragePickupSiteCancel'], ['id' => $id], null, []);
-    }
-
-    /** GET /app/v1/locker-storage/rentals/{id} — Show one stored bag */
-    public function platformAppLockerStorageRental(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageRental'], ['id' => $id], null, []);
-    }
-
-    /** GET /app/v1/locker-storage/rentals — List the renter's stored luggage */
-    public function platformAppLockerStorageRentals(?string $scope = null, ?int $page = null, ?int $perPage = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageRentals'], ['scope' => $scope, 'page' => $page, 'per_page' => $perPage], null, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/resend-code — Send the pickup code again */
-    public function platformAppLockerStorageResendCode(int $id): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageResendCode'], ['id' => $id], null, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/return-time — Change when you come back */
-    public function platformAppLockerStorageReturnTime(int $id, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageReturnTime'], ['id' => $id], $body, []);
-    }
-
-    /** POST /app/v1/locker-storage/rentals/{id}/shipment — Ship the bag with a carrier or courier */
-    public function platformAppLockerStorageShipment(int $id, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppLockerStorageShipment'], ['id' => $id], $body, []);
+        return ($this->call)(self::operations()['platformAppLinkResolve'], ['url' => $url, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/mall/categories/{categoryId} — Mall category products */
-    public function platformAppMallCategory(int $categoryId, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppMallCategory(int $categoryId, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMallCategory'], ['categoryId' => $categoryId, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppMallCategory'], ['categoryId' => $categoryId, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/mall/group-buys — Group buy channel */
-    public function platformAppMallGroupBuys(?int $category = null, ?string $locale = null): mixed
+    public function platformAppMallGroupBuys(?int $category = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMallGroupBuys'], ['category' => $category, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppMallGroupBuys'], ['category' => $category, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/mall/home — Mall home blocks */
-    public function platformAppMallHome(?string $locale = null): mixed
+    public function platformAppMallHome(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMallHome'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppMallHome'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/mall/search — Mall search */
-    public function platformAppMallSearch(?string $q = null, ?string $locale = null): mixed
+    public function platformAppMallSearch(?string $q = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMallSearch'], ['q' => $q, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppMallSearch'], ['q' => $q, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/mall/stores — Store directory */
-    public function platformAppMallStores(?string $type = null, ?string $tag = null, ?string $q = null, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppMallStores(?string $type = null, ?string $tag = null, ?string $q = null, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMallStores'], ['type' => $type, 'tag' => $tag, 'q' => $q, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppMallStores'], ['type' => $type, 'tag' => $tag, 'q' => $q, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/notifications/read-all — Mark all app notifications as read */
-    public function platformAppMarkAllNotificationsRead(): mixed
+    public function platformAppMarkAllNotificationsRead(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMarkAllNotificationsRead'], [], null, []);
+        return ($this->call)(self::operations()['platformAppMarkAllNotificationsRead'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/notifications/{notificationId}/read — Mark one app notification as read */
-    public function platformAppMarkNotificationRead(string $notificationId): mixed
+    public function platformAppMarkNotificationRead(string $notificationId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppMarkNotificationRead'], ['notificationId' => $notificationId], null, []);
+        return ($this->call)(self::operations()['platformAppMarkNotificationRead'], ['notificationId' => $notificationId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/notifications/preferences — Get notification preferences */
-    public function platformAppNotificationPreferences(): mixed
+    public function platformAppNotificationPreferences(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppNotificationPreferences'], [], null, []);
+        return ($this->call)(self::operations()['platformAppNotificationPreferences'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/notifications/realtime — Get foreground notification MQTT credentials */
-    public function platformAppNotificationRealtime(string $deviceId): mixed
+    public function platformAppNotificationRealtime(string $deviceId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppNotificationRealtime'], ['device_id' => $deviceId], null, []);
+        return ($this->call)(self::operations()['platformAppNotificationRealtime'], ['device_id' => $deviceId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/notifications — List app notifications */
-    public function platformAppNotifications(?string $filter = null, ?string $category = null, ?int $page = null, ?int $perPage = null): mixed
+    public function platformAppNotifications(?string $filter = null, ?string $category = null, ?int $page = null, ?int $perPage = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppNotifications'], ['filter' => $filter, 'category' => $category, 'page' => $page, 'per_page' => $perPage], null, []);
+        return ($this->call)(self::operations()['platformAppNotifications'], ['filter' => $filter, 'category' => $category, 'page' => $page, 'per_page' => $perPage, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/orders/{orderType}/{orderId} — Show an app-enabled customer order */
-    public function platformAppOrder(string $orderType, int $orderId): mixed
+    public function platformAppOrder(string $orderType, int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppOrder'], ['orderType' => $orderType, 'orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['platformAppOrder'], ['orderType' => $orderType, 'orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/orders — List app-enabled customer orders */
-    public function platformAppOrders(?string $type = null, ?string $status = null, ?string $search = null, ?int $perPage = null, ?int $page = null): mixed
+    public function platformAppOrders(?string $type = null, ?string $status = null, ?string $search = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppOrders'], ['type' => $type, 'status' => $status, 'search' => $search, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['platformAppOrders'], ['type' => $type, 'status' => $status, 'search' => $search, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/pay/requests/{publicToken}/pay — Pay a payment request */
-    public function platformAppPay(string $publicToken, array $body): mixed
+    public function platformAppPay(string $publicToken, array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPay'], ['publicToken' => $publicToken], $body, []);
+        return ($this->call)(self::operations()['platformAppPay'], ['publicToken' => $publicToken, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/pay/requests — Raise a payment request for one payable */
-    public function platformAppPayCreateRequest(array $body): mixed
+    public function platformAppPayCreateRequest(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPayCreateRequest'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppPayCreateRequest'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/pay/outstanding — Everything this payer owes */
-    public function platformAppPayOutstanding(): mixed
+    public function platformAppPayOutstanding(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPayOutstanding'], [], null, []);
+        return ($this->call)(self::operations()['platformAppPayOutstanding'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/pay/requests/{publicToken} — One payment request and its methods */
-    public function platformAppPayRequest(string $publicToken): mixed
+    public function platformAppPayRequest(string $publicToken, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPayRequest'], ['publicToken' => $publicToken], null, []);
+        return ($this->call)(self::operations()['platformAppPayRequest'], ['publicToken' => $publicToken, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/pay/links — Pay the code shown on a cabinet screen */
-    public function platformAppPayResolveLink(array $body): mixed
+    public function platformAppPayResolveLink(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPayResolveLink'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppPayResolveLink'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/pay/resolve — Resolve a scanned pay tag */
-    public function platformAppPayResolveTag(array $body): mixed
+    public function platformAppPayResolveTag(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPayResolveTag'], [], $body, []);
-    }
-
-    /** GET /app/v1/pickups/{deliveryId} — Show a customer locker pickup */
-    public function platformAppPickup(int $deliveryId): mixed
-    {
-        return ($this->call)(self::operations()['platformAppPickup'], ['deliveryId' => $deliveryId], null, []);
-    }
-
-    /** GET /app/v1/pickups — List customer locker pickups */
-    public function platformAppPickups(?string $status = null, ?int $perPage = null, ?int $page = null): mixed
-    {
-        return ($this->call)(self::operations()['platformAppPickups'], ['status' => $status, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['platformAppPayResolveTag'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/privacy — Get app privacy overview */
-    public function platformAppPrivacy(): mixed
+    public function platformAppPrivacy(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPrivacy'], [], null, []);
+        return ($this->call)(self::operations()['platformAppPrivacy'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/quotes/{line} — Quote a line without signing in */
-    public function platformAppPublicQuote(string $line, ?array $body = null): mixed
+    public function platformAppPublicQuote(string $line, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPublicQuote'], ['line' => $line], $body, []);
+        return ($this->call)(self::operations()['platformAppPublicQuote'], ['line' => $line, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/quotes/schema — The quote form a client offers without signing in */
-    public function platformAppPublicQuoteSchema(?string $locale = null): mixed
+    public function platformAppPublicQuoteSchema(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppPublicQuoteSchema'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppPublicQuoteSchema'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/registration/complete — Register a Client customer */
-    public function platformAppRegisterCustomer(array $body, ?string $clientCode = null): mixed
+    public function platformAppRegisterCustomer(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRegisterCustomer'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppRegisterCustomer'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/devices — Register an app push device */
-    public function platformAppRegisterDevice(array $body): mixed
+    public function platformAppRegisterDevice(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRegisterDevice'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppRegisterDevice'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/registration/clients — List the Clients that accept new customer registrations */
-    public function platformAppRegistrationClients(): mixed
+    public function platformAppRegistrationClients(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRegistrationClients'], [], null, []);
+        return ($this->call)(self::operations()['platformAppRegistrationClients'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/registration-details — Registration details still to fill in */
-    public function platformAppRegistrationDetails(): mixed
+    public function platformAppRegistrationDetails(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRegistrationDetails'], [], null, []);
+        return ($this->call)(self::operations()['platformAppRegistrationDetails'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/privacy/account-deletion — Request account closure */
-    public function platformAppRequestAccountDeletion(array $body): mixed
+    public function platformAppRequestAccountDeletion(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRequestAccountDeletion'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppRequestAccountDeletion'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/privacy/phone/request — Request phone verification for the signed-in customer */
-    public function platformAppRequestPhoneVerification(array $body): mixed
+    public function platformAppRequestPhoneVerification(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRequestPhoneVerification'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppRequestPhoneVerification'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/registration/phone/request — Request a registration phone verification code */
-    public function platformAppRequestRegistrationCode(array $body, ?string $clientCode = null): mixed
+    public function platformAppRequestRegistrationCode(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRequestRegistrationCode'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppRequestRegistrationCode'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/clients/{clientCode}/registration/email/request — Request a registration email verification code */
-    public function platformAppRequestRegistrationEmailCode(array $body, ?string $clientCode = null): mixed
+    public function platformAppRequestRegistrationEmailCode(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRequestRegistrationEmailCode'], ['clientCode' => $clientCode], $body, []);
+        return ($this->call)(self::operations()['platformAppRequestRegistrationEmailCode'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/returns/{returnId}/confirmation-email — Resend a return confirmation email */
-    public function platformAppResendReturnConfirmation(int $returnId): mixed
+    public function platformAppResendReturnConfirmation(int $returnId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppResendReturnConfirmation'], ['returnId' => $returnId], null, []);
+        return ($this->call)(self::operations()['platformAppResendReturnConfirmation'], ['returnId' => $returnId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/returns/{returnId} — Show a customer return request */
-    public function platformAppReturn(int $returnId): mixed
+    public function platformAppReturn(int $returnId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppReturn'], ['returnId' => $returnId], null, []);
+        return ($this->call)(self::operations()['platformAppReturn'], ['returnId' => $returnId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/returns/config — Get App return configuration */
-    public function platformAppReturnConfiguration(?string $locale = null): mixed
+    public function platformAppReturnConfiguration(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppReturnConfiguration'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppReturnConfiguration'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/returns/fee-quote — Quote a return channel's fee */
-    public function platformAppReturnFeeQuote(array $body): mixed
+    public function platformAppReturnFeeQuote(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppReturnFeeQuote'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppReturnFeeQuote'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/returns — List customer return requests */
-    public function platformAppReturns(?int $status = null, ?int $perPage = null, ?int $page = null): mixed
+    public function platformAppReturns(?int $status = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppReturns'], ['status' => $status, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['platformAppReturns'], ['status' => $status, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** DELETE /app/v1/devices/{deviceId} — Revoke an app push device */
-    public function platformAppRevokeDevice(string $deviceId): mixed
+    public function platformAppRevokeDevice(string $deviceId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppRevokeDevice'], ['deviceId' => $deviceId], null, []);
+        return ($this->call)(self::operations()['platformAppRevokeDevice'], ['deviceId' => $deviceId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/stores/{slug} — Store page */
-    public function platformAppStore(string $slug, ?string $q = null, ?int $cat = null, ?string $sort = null, ?string $table = null, ?string $locale = null): mixed
+    public function platformAppStore(string $slug, ?string $q = null, ?int $cat = null, ?string $sort = null, ?string $table = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStore'], ['slug' => $slug, 'q' => $q, 'cat' => $cat, 'sort' => $sort, 'table' => $table, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStore'], ['slug' => $slug, 'q' => $q, 'cat' => $cat, 'sort' => $sort, 'table' => $table, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/stores/{slug}/cart — Cart of one store */
-    public function platformAppStoreCart(string $slug, ?string $locale = null): mixed
+    public function platformAppStoreCart(string $slug, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCart'], ['slug' => $slug, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreCart'], ['slug' => $slug, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/stores/{slug}/cart/items — Add to cart */
-    public function platformAppStoreCartAdd(string $slug, array $body, ?string $locale = null): mixed
+    public function platformAppStoreCartAdd(string $slug, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCartAdd'], ['slug' => $slug, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreCartAdd'], ['slug' => $slug, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** DELETE /app/v1/stores/{slug}/cart/items/{itemId} — Remove a cart line */
-    public function platformAppStoreCartRemove(string $slug, int $itemId, ?string $locale = null): mixed
+    public function platformAppStoreCartRemove(string $slug, int $itemId, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCartRemove'], ['slug' => $slug, 'itemId' => $itemId, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreCartRemove'], ['slug' => $slug, 'itemId' => $itemId, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** PATCH /app/v1/stores/{slug}/cart/items/{itemId} — Change a cart line quantity */
-    public function platformAppStoreCartUpdate(string $slug, int $itemId, array $body, ?string $locale = null): mixed
+    public function platformAppStoreCartUpdate(string $slug, int $itemId, array $body, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCartUpdate'], ['slug' => $slug, 'itemId' => $itemId, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreCartUpdate'], ['slug' => $slug, 'itemId' => $itemId, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/stores/{slug}/categories/{categoryId} — Store category page (multi-page style) */
-    public function platformAppStoreCategory(string $slug, int $categoryId, ?string $sort = null, ?int $sub = null, ?bool $inStock = null, ?int $page = null, ?string $locale = null): mixed
+    public function platformAppStoreCategory(string $slug, int $categoryId, ?string $sort = null, ?int $sub = null, ?bool $inStock = null, ?int $page = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCategory'], ['slug' => $slug, 'categoryId' => $categoryId, 'sort' => $sort, 'sub' => $sub, 'in_stock' => $inStock, 'page' => $page, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreCategory'], ['slug' => $slug, 'categoryId' => $categoryId, 'sort' => $sort, 'sub' => $sub, 'in_stock' => $inStock, 'page' => $page, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/stores/{slug}/checkout/place — Place the order from the cart */
-    public function platformAppStoreCheckoutPlace(string $slug, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppStoreCheckoutPlace(string $slug, ?string $locale = null, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCheckoutPlace'], ['slug' => $slug, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreCheckoutPlace'], ['slug' => $slug, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/stores/{slug}/checkout/quote — Price the cart of a store for the order the buyer is about to place */
-    public function platformAppStoreCheckoutQuote(string $slug, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppStoreCheckoutQuote(string $slug, ?string $locale = null, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreCheckoutQuote'], ['slug' => $slug, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreCheckoutQuote'], ['slug' => $slug, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/stores/{slug}/home — Store home page (multi-page style) */
-    public function platformAppStoreHome(string $slug, ?string $locale = null): mixed
+    public function platformAppStoreHome(string $slug, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreHome'], ['slug' => $slug, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreHome'], ['slug' => $slug, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/store-orders/{code} — One store order of the account */
-    public function platformAppStoreOrder(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrder(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrder'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrder'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/cancel — Cancel the order before the store accepts it */
-    public function platformAppStoreOrderCancel(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrderCancel(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderCancel'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderCancel'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/confirm-payment — After the PaymentSheet */
-    public function platformAppStoreOrderConfirmPayment(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrderConfirmPayment(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderConfirmPayment'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderConfirmPayment'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/locker-open — Open the next door of a paid locker pickup, on the buyer's own press at the cabi */
-    public function platformAppStoreOrderLockerOpen(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrderLockerOpen(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderLockerOpen'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderLockerOpen'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/locker-refund — Refund a locker pickup whose door never opened */
-    public function platformAppStoreOrderLockerRefund(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrderLockerRefund(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderLockerRefund'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderLockerRefund'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/pay — Pay an unpaid order whose payment was left unfinished */
-    public function platformAppStoreOrderPay(string $code, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppStoreOrderPay(string $code, ?string $locale = null, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderPay'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderPay'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/store-orders/{code}/reorder — Put the order's lines back into the buyer's cart at the store */
-    public function platformAppStoreOrderReorder(string $code, ?string $locale = null): mixed
+    public function platformAppStoreOrderReorder(string $code, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderReorder'], ['code' => $code, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderReorder'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/store-orders/{code}/return — Ask the store to take a paid or completed order back */
-    public function platformAppStoreOrderReturn(string $code, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppStoreOrderReturn(string $code, ?string $locale = null, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderReturn'], ['code' => $code, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderReturn'], ['code' => $code, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/store-orders/{code}/review/{productId} — Rate one product of the order (1 to 5, optional comment) */
-    public function platformAppStoreOrderReview(string $code, int $productId, ?string $locale = null, ?array $body = null): mixed
+    public function platformAppStoreOrderReview(string $code, int $productId, ?string $locale = null, ?array $body = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrderReview'], ['code' => $code, 'productId' => $productId, 'locale' => $locale], $body, []);
+        return ($this->call)(self::operations()['platformAppStoreOrderReview'], ['code' => $code, 'productId' => $productId, 'locale' => $locale, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/store-orders — The account's store orders at this client, newest first */
-    public function platformAppStoreOrders(?string $scope = null, ?int $page = null, ?int $perPage = null, ?string $include = null, ?string $locale = null): mixed
+    public function platformAppStoreOrders(?string $scope = null, ?int $page = null, ?int $perPage = null, ?string $include = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreOrders'], ['scope' => $scope, 'page' => $page, 'per_page' => $perPage, 'include' => $include, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreOrders'], ['scope' => $scope, 'page' => $page, 'per_page' => $perPage, 'include' => $include, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/stores/{slug}/products/{productId} — Product page */
-    public function platformAppStoreProduct(string $slug, int $productId, ?string $locale = null): mixed
+    public function platformAppStoreProduct(string $slug, int $productId, ?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/storefront — Storefront entry */
-    public function platformAppStorefront(?string $locale = null): mixed
+    public function platformAppStorefront(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppStorefront'], ['locale' => $locale], null, []);
-    }
-
-    /** POST /app/v1/pickups/{deliveryId}/handoff/revoke — Take back a handed-over locker pickup */
-    public function platformAppTakeBackPickup(int $deliveryId): mixed
-    {
-        return ($this->call)(self::operations()['platformAppTakeBackPickup'], ['deliveryId' => $deliveryId], null, []);
+        return ($this->call)(self::operations()['platformAppStorefront'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/track — Track any code (signed in) */
-    public function platformAppTrack(array $body): mixed
+    public function platformAppTrack(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppTrack'], [], $body, []);
-    }
-
-    /** PUT /app/v1/locker-locations/{locationId}/preference — Update a customer SmartLocker preference */
-    public function platformAppUpdateLockerPreference(int $locationId, array $body): mixed
-    {
-        return ($this->call)(self::operations()['platformAppUpdateLockerPreference'], ['locationId' => $locationId], $body, []);
+        return ($this->call)(self::operations()['platformAppTrack'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** PUT /app/v1/notifications/preferences — Update notification preferences */
-    public function platformAppUpdateNotificationPreferences(array $body): mixed
+    public function platformAppUpdateNotificationPreferences(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppUpdateNotificationPreferences'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppUpdateNotificationPreferences'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/privacy/phone/verify — Verify and link the signed-in customer's phone */
-    public function platformAppVerifyPhone(array $body): mixed
+    public function platformAppVerifyPhone(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppVerifyPhone'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppVerifyPhone'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/wallet — Get the app-scoped customer wallet */
-    public function platformAppWallet(?string $locale = null): mixed
+    public function platformAppWallet(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWallet'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppWallet'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/wallet/top-ups — Create an idempotent customer wallet top-up */
-    public function platformAppWalletCreateTopUp(array $body): mixed
+    public function platformAppWalletCreateTopUp(array $body, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWalletCreateTopUp'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppWalletCreateTopUp'], ['Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/wallet/payment-methods — List Client-approved wallet payment methods */
-    public function platformAppWalletPaymentMethods(?string $locale = null): mixed
+    public function platformAppWalletPaymentMethods(?string $locale = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWalletPaymentMethods'], ['locale' => $locale], null, []);
+        return ($this->call)(self::operations()['platformAppWalletPaymentMethods'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/wallet/tax-preview — Preview configured customer tax */
-    public function platformAppWalletTaxPreview(array $body): mixed
+    public function platformAppWalletTaxPreview(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWalletTaxPreview'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppWalletTaxPreview'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/wallet/top-ups/{operationId} — Get a wallet top-up status */
-    public function platformAppWalletTopUpStatus(int $operationId): mixed
+    public function platformAppWalletTopUpStatus(int $operationId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWalletTopUpStatus'], ['operationId' => $operationId], null, []);
+        return ($this->call)(self::operations()['platformAppWalletTopUpStatus'], ['operationId' => $operationId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/wallet/transactions — List the customer wallet ledger */
-    public function platformAppWalletTransactions(?string $category = null, ?int $status = null, ?int $type = null, ?int $perPage = null, ?int $page = null): mixed
+    public function platformAppWalletTransactions(?string $category = null, ?int $status = null, ?int $type = null, ?int $perPage = null, ?int $page = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWalletTransactions'], ['category' => $category, 'status' => $status, 'type' => $type, 'per_page' => $perPage, 'page' => $page], null, []);
+        return ($this->call)(self::operations()['platformAppWalletTransactions'], ['category' => $category, 'status' => $status, 'type' => $type, 'per_page' => $perPage, 'page' => $page, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/account-closure/withdraw — Withdraw a pending account closure request */
-    public function platformAppWithdrawAccountClosure(array $body): mixed
+    public function platformAppWithdrawAccountClosure(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['platformAppWithdrawAccountClosure'], [], $body, []);
+        return ($this->call)(self::operations()['platformAppWithdrawAccountClosure'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/uniorder/{orderId} — Uniorder: read an order */
-    public function uniorder(int $orderId): mixed
+    public function uniorder(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorder'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['uniorder'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/uniorder/{orderId}/cancel — Uniorder: cancel an order */
-    public function uniorderCancel(int $orderId): mixed
+    public function uniorderCancel(int $orderId, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderCancel'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['uniorderCancel'], ['orderId' => $orderId, 'Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/uniorder — Uniorder: create an order at a rate */
-    public function uniorderCreate(array $body): mixed
+    public function uniorderCreate(array $body, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderCreate'], [], $body, []);
+        return ($this->call)(self::operations()['uniorderCreate'], ['Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/uniorder/{orderId}/label — Uniorder: download the label */
-    public function uniorderLabel(int $orderId, ?int $hideSenderAddress = null, ?int $hideReceiverAddress = null): mixed
+    public function uniorderLabel(int $orderId, ?int $hideSenderAddress = null, ?int $hideReceiverAddress = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderLabel'], ['orderId' => $orderId, 'hide_sender_address' => $hideSenderAddress, 'hide_receiver_address' => $hideReceiverAddress], null, []);
+        return ($this->call)(self::operations()['uniorderLabel'], ['orderId' => $orderId, 'hide_sender_address' => $hideSenderAddress, 'hide_receiver_address' => $hideReceiverAddress, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/uniorder/{orderId}/label — Uniorder: buy the label of a label order kept without one */
-    public function uniorderPurchaseLabel(int $orderId, ?array $body = null): mixed
+    public function uniorderPurchaseLabel(int $orderId, ?array $body = null, ?string $idempotencyKey = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderPurchaseLabel'], ['orderId' => $orderId], $body, []);
+        return ($this->call)(self::operations()['uniorderPurchaseLabel'], ['orderId' => $orderId, 'Idempotency-Key' => $idempotencyKey, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /app/v1/uniorder/rate — Uniorder: rate a shipment (self delivery and label carrier services) */
-    public function uniorderRate(array $body): mixed
+    public function uniorderRate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderRate'], [], $body, []);
+        return ($this->call)(self::operations()['uniorderRate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/uniorder/{orderId}/tracking — Uniorder: track an order */
-    public function uniorderTracking(int $orderId): mixed
+    public function uniorderTracking(int $orderId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['uniorderTracking'], ['orderId' => $orderId], null, []);
+        return ($this->call)(self::operations()['uniorderTracking'], ['orderId' => $orderId, 'extraQuery' => $extraQuery], null, []);
     }
 }

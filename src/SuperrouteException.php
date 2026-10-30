@@ -8,6 +8,10 @@ namespace Superroute\SApp;
  * Every failed call. `status` is the HTTP status (0 when the request never got an answer), `errorCode` the server's
  * error code (`invalid_token`, `insufficient_scope`, `access_denied`, a platform app code such as `APP_ACCESS_DENIED`,
  * …) when it sent one, `body` the decoded answer.
+ *
+ * An answer `{"result": false, …}` is a failed call too, whatever its status (Superroute sometimes answers a refusal
+ * with 200): `errors` holds its field messages (field => list of messages), `reasons` and `data` what it sent beside
+ * them.
  */
 class SuperrouteException extends \RuntimeException
 {
@@ -18,6 +22,10 @@ class SuperrouteException extends \RuntimeException
         public readonly mixed $body = null,
         public readonly ?string $requestId = null,
         ?\Throwable $previous = null,
+        /** @var array<string, list<string>> */
+        public readonly array $errors = [],
+        public readonly mixed $reasons = null,
+        public readonly mixed $data = null,
     ) {
         parent::__construct($message ?? $errorCode ?? "Request failed with status {$status}", 0, $previous);
     }
@@ -41,6 +49,23 @@ class SuperrouteException extends \RuntimeException
             ?? (is_string($message) && $message !== '' ? $message : null)
             ?? $text('title');
 
-        return new self($status, $code, $description, $body, $text('request_id') ?? $requestId);
+        $code ??= isset($b['code']) && is_int($b['code']) ? (string) $b['code'] : null;
+        $errors = [];
+        if (is_array($b['errors'] ?? null) && !array_is_list($b['errors'])) {
+            foreach ($b['errors'] as $field => $value) {
+                if ($value === null) {
+                    continue;
+                }
+                $errors[(string) $field] = array_map(
+                    static fn ($v): string => Http::text($v),
+                    is_array($value) && array_is_list($value) ? $value : [$value],
+                );
+            }
+        }
+
+        return new self(
+            $status, $code, $description, $body, $text('request_id') ?? $requestId, null,
+            $errors, $b['reasons'] ?? null, $b['data'] ?? null,
+        );
     }
 }

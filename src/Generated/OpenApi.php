@@ -79,308 +79,308 @@ final class OpenApi
     }
 
     /** POST /v1/auth/session — Get a session token */
-    public function authSession(array $body): mixed
+    public function authSession(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['authSession'], [], $body, []);
+        return ($this->call)(self::operations()['authSession'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** DELETE /v1/auth/session — Revoke a session token */
-    public function authSessionRevokeDelete(): mixed
+    public function authSessionRevokeDelete(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['authSessionRevokeDelete'], [], null, []);
+        return ($this->call)(self::operations()['authSessionRevokeDelete'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/capabilities — List capabilities */
-    public function capabilitiesIndex(): mixed
+    public function capabilitiesIndex(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['capabilitiesIndex'], [], null, []);
+        return ($this->call)(self::operations()['capabilitiesIndex'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/capabilities/{code} — Get one capability */
-    public function capabilitiesShow(string $code): mixed
+    public function capabilitiesShow(string $code, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['capabilitiesShow'], ['code' => $code], null, []);
+        return ($this->call)(self::operations()['capabilitiesShow'], ['code' => $code, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/directions — Compute directions */
-    public function directionsCompute(array $body): mixed
+    public function directionsCompute(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['directionsCompute'], [], $body, []);
+        return ($this->call)(self::operations()['directionsCompute'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/document/verify — Verify a document */
-    public function documentVerify(array $body): mixed
+    public function documentVerify(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['documentVerify'], [], $body, []);
+        return ($this->call)(self::operations()['documentVerify'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/eta — Estimate arrival times */
-    public function etaEstimate(array $body): mixed
+    public function etaEstimate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['etaEstimate'], [], $body, []);
+        return ($this->call)(self::operations()['etaEstimate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/autocomplete — Suggest addresses */
-    public function geoAutocomplete(array $body): mixed
+    public function geoAutocomplete(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoAutocomplete'], [], $body, []);
+        return ($this->call)(self::operations()['geoAutocomplete'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /v1/geo/coverage — Geocoding coverage */
-    public function geoCoverage(): mixed
+    public function geoCoverage(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoCoverage'], [], null, []);
+        return ($this->call)(self::operations()['geoCoverage'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/geo/forward — Geocode an address */
-    public function geoForward(array $body): mixed
+    public function geoForward(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoForward'], [], $body, []);
+        return ($this->call)(self::operations()['geoForward'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/forward/batch — Geocode many addresses */
-    public function geoForwardBatch(array $body): mixed
+    public function geoForwardBatch(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoForwardBatch'], [], $body, []);
+        return ($this->call)(self::operations()['geoForwardBatch'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/place — Get a suggestion's address */
-    public function geoPlace(array $body): mixed
+    public function geoPlace(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoPlace'], [], $body, []);
+        return ($this->call)(self::operations()['geoPlace'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/reverse — Reverse geocode a coordinate */
-    public function geoReverse(array $body): mixed
+    public function geoReverse(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoReverse'], [], $body, []);
+        return ($this->call)(self::operations()['geoReverse'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/reverse/batch — Reverse geocode many coordinates */
-    public function geoReverseBatch(array $body): mixed
+    public function geoReverseBatch(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoReverseBatch'], [], $body, []);
+        return ($this->call)(self::operations()['geoReverseBatch'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/geo/validate — Validate an address */
-    public function geoValidate(array $body): mixed
+    public function geoValidate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['geoValidate'], [], $body, []);
+        return ($this->call)(self::operations()['geoValidate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/isochrone — Draw reach areas */
-    public function isochroneCompute(array $body): mixed
+    public function isochroneCompute(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['isochroneCompute'], [], $body, []);
+        return ($this->call)(self::operations()['isochroneCompute'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/jobs/{jobId}/cancel — Cancel a job */
-    public function jobsCancel(string $jobId): mixed
+    public function jobsCancel(string $jobId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsCancel'], ['jobId' => $jobId], null, []);
+        return ($this->call)(self::operations()['jobsCancel'], ['jobId' => $jobId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/jobs/{jobId}/deliveries — List webhook deliveries */
-    public function jobsDeliveries(string $jobId): mixed
+    public function jobsDeliveries(string $jobId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsDeliveries'], ['jobId' => $jobId], null, []);
+        return ($this->call)(self::operations()['jobsDeliveries'], ['jobId' => $jobId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/jobs/{jobId}/deliveries/{deliveryId}/replay — Replay a webhook delivery */
-    public function jobsDeliveriesReplay(string $jobId, string $deliveryId): mixed
+    public function jobsDeliveriesReplay(string $jobId, string $deliveryId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsDeliveriesReplay'], ['jobId' => $jobId, 'deliveryId' => $deliveryId], null, []);
+        return ($this->call)(self::operations()['jobsDeliveriesReplay'], ['jobId' => $jobId, 'deliveryId' => $deliveryId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/jobs — List jobs */
-    public function jobsIndex(): mixed
+    public function jobsIndex(?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsIndex'], [], null, []);
+        return ($this->call)(self::operations()['jobsIndex'], ['extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/jobs/{jobId}/result — Collect a job result */
-    public function jobsResult(string $jobId): mixed
+    public function jobsResult(string $jobId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsResult'], ['jobId' => $jobId], null, []);
+        return ($this->call)(self::operations()['jobsResult'], ['jobId' => $jobId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /v1/jobs/{jobId} — Get job status */
-    public function jobsShow(string $jobId): mixed
+    public function jobsShow(string $jobId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['jobsShow'], ['jobId' => $jobId], null, []);
+        return ($this->call)(self::operations()['jobsShow'], ['jobId' => $jobId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/label/barcode — Draw a barcode */
-    public function labelBarcode(array $body): mixed
+    public function labelBarcode(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['labelBarcode'], [], $body, []);
+        return ($this->call)(self::operations()['labelBarcode'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/loading/solve — Plan a container load */
-    public function loadingSolve(array $body): mixed
+    public function loadingSolve(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['loadingSolve'], [], $body, []);
+        return ($this->call)(self::operations()['loadingSolve'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/map/static — Draw a static map */
-    public function mapStatic(array $body): mixed
+    public function mapStatic(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['mapStatic'], [], $body, []);
+        return ($this->call)(self::operations()['mapStatic'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/map/token — Issue a map token */
-    public function mapToken(array $body): mixed
+    public function mapToken(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['mapToken'], [], $body, []);
+        return ($this->call)(self::operations()['mapToken'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/matrix — Compute a distance matrix */
-    public function matrixCompute(array $body): mixed
+    public function matrixCompute(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['matrixCompute'], [], $body, []);
+        return ($this->call)(self::operations()['matrixCompute'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/network/site-scenario — Compare network scenarios */
-    public function networkSite_scenario(array $body): mixed
+    public function networkSite_scenario(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['networkSite_scenario'], [], $body, []);
+        return ($this->call)(self::operations()['networkSite_scenario'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/packing/solve — Choose cartons */
-    public function packingSolve(array $body): mixed
+    public function packingSolve(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['packingSolve'], [], $body, []);
+        return ($this->call)(self::operations()['packingSolve'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/picking/batch — Batch picks */
-    public function pickingBatch(array $body): mixed
+    public function pickingBatch(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['pickingBatch'], [], $body, []);
+        return ($this->call)(self::operations()['pickingBatch'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/insert — Insert jobs */
-    public function planInsert(array $body): mixed
+    public function planInsert(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planInsert'], [], $body, []);
+        return ($this->call)(self::operations()['planInsert'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** DELETE /v1/plan/matrix/{matrixId} — Close a distance snapshot */
-    public function planMatrixCloseDelete(string $matrixId): mixed
+    public function planMatrixCloseDelete(string $matrixId, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planMatrixCloseDelete'], ['matrixId' => $matrixId], null, []);
+        return ($this->call)(self::operations()['planMatrixCloseDelete'], ['matrixId' => $matrixId, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/plan/matrix — Open a distance snapshot */
-    public function planMatrixOpen(array $body): mixed
+    public function planMatrixOpen(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planMatrixOpen'], [], $body, []);
+        return ($this->call)(self::operations()['planMatrixOpen'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/move — Move stops */
-    public function planMove(array $body): mixed
+    public function planMove(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planMove'], [], $body, []);
+        return ($this->call)(self::operations()['planMove'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/recost — Re-cost a plan */
-    public function planRecost(array $body): mixed
+    public function planRecost(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planRecost'], [], $body, []);
+        return ($this->call)(self::operations()['planRecost'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/refine — Refine routes */
-    public function planRefine(array $body): mixed
+    public function planRefine(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planRefine'], [], $body, []);
+        return ($this->call)(self::operations()['planRefine'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/remove — Remove stops */
-    public function planRemove(array $body): mixed
+    public function planRemove(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planRemove'], [], $body, []);
+        return ($this->call)(self::operations()['planRemove'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/resequence — Reorder a route */
-    public function planResequence(array $body): mixed
+    public function planResequence(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planResequence'], [], $body, []);
+        return ($this->call)(self::operations()['planResequence'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/token — Get a plan editor token */
-    public function planToken(array $body): mixed
+    public function planToken(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planToken'], [], $body, []);
+        return ($this->call)(self::operations()['planToken'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/validate — Validate a plan */
-    public function planValidate(array $body): mixed
+    public function planValidate(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planValidate'], [], $body, []);
+        return ($this->call)(self::operations()['planValidate'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/what-if — Compare plans */
-    public function planWhat_if(array $body): mixed
+    public function planWhat_if(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['planWhat_if'], [], $body, []);
+        return ($this->call)(self::operations()['planWhat_if'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/routing/insert — Insert stops */
-    public function routingInsert(array $body): mixed
+    public function routingInsert(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['routingInsert'], [], $body, []);
+        return ($this->call)(self::operations()['routingInsert'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/routing/optimize — Optimize routes */
-    public function routingOptimize(array $body): mixed
+    public function routingOptimize(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['routingOptimize'], [], $body, []);
+        return ($this->call)(self::operations()['routingOptimize'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /v1/routing/presets — List balance presets */
-    public function routingPresets(?string $engine = null): mixed
+    public function routingPresets(?string $engine = null, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['routingPresets'], ['engine' => $engine], null, []);
+        return ($this->call)(self::operations()['routingPresets'], ['engine' => $engine, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /v1/routing/refine — Refine an existing plan */
-    public function routingRefine(array $body): mixed
+    public function routingRefine(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['routingRefine'], [], $body, []);
+        return ($this->call)(self::operations()['routingRefine'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/routing/what-if — Compare alternative plans */
-    public function routingWhatif(array $body): mixed
+    public function routingWhatif(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['routingWhatif'], [], $body, []);
+        return ($this->call)(self::operations()['routingWhatif'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/slots/quote — Quote delivery slots */
-    public function slotsQuote(array $body): mixed
+    public function slotsQuote(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['slotsQuote'], [], $body, []);
+        return ($this->call)(self::operations()['slotsQuote'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/territory/design — Design territories */
-    public function territoryDesign(array $body): mixed
+    public function territoryDesign(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['territoryDesign'], [], $body, []);
+        return ($this->call)(self::operations()['territoryDesign'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/trace/match — Match a GPS trace */
-    public function traceMatch(array $body): mixed
+    public function traceMatch(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['traceMatch'], [], $body, []);
+        return ($this->call)(self::operations()['traceMatch'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/webhooks/verify — Verify a webhook endpoint */
-    public function webhooksVerify(array $body): mixed
+    public function webhooksVerify(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['webhooksVerify'], [], $body, []);
+        return ($this->call)(self::operations()['webhooksVerify'], ['extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/weight/chargeable — Work out chargeable weight */
-    public function weightChargeable(array $body): mixed
+    public function weightChargeable(array $body, ?array $extraQuery = null): mixed
     {
-        return ($this->call)(self::operations()['weightChargeable'], [], $body, []);
+        return ($this->call)(self::operations()['weightChargeable'], ['extraQuery' => $extraQuery], $body, []);
     }
 }

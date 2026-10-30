@@ -22,11 +22,15 @@ final class GeneratedTest extends TestCase
         self::assertCount($counts['partner'], PartnerApi::operations());
         self::assertCount($counts['open'], OpenApi::operations());
 
+        // Smart-locker operations are in sLocker, never generated here (tools/locker_paths.json).
+        $locker = json_decode((string) file_get_contents(dirname(self::SPECS) . '/tools/locker_paths.json'), true);
+        $isLocker = static fn (string $path): bool => preg_match('#' . $locker['scopes']['partner'] . '#', $path, $m) === 1
+            && in_array($m[1], $locker['segments'], true);
         foreach (['partner-api.json' => PartnerApi::class, 'open-api.json' => OpenApi::class] as $file => $class) {
             $spec = json_decode((string) file_get_contents(self::SPECS . '/' . $file), true);
             $ids = [];
             foreach ($spec['paths'] as $path => $methods) {
-                if ($class === PartnerApi::class && (str_starts_with($path, '/app/oauth') || $path === '/app/graphql')) {
+                if ($class === PartnerApi::class && (str_starts_with($path, '/app/oauth') || $path === '/app/graphql' || $isLocker($path))) {
                     continue;
                 }
                 foreach ($methods as $verb => $op) {

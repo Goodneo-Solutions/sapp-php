@@ -9,6 +9,7 @@ use Superroute\SApp\Generated\OpenApi;
 use Superroute\SApp\Generated\PartnerApi;
 use Superroute\SApp\MemoryTokenStore;
 use Superroute\SApp\OpenClient;
+use Superroute\SApp\Operation;
 use Superroute\SApp\PartnerClient;
 use Superroute\SApp\Pkce;
 use Superroute\SApp\SuperrouteException;
@@ -110,29 +111,12 @@ final class SdkTest extends TestCase
         self::assertSame('/app/v1/notifications/0f8fad5b-d9cb-469f-a165-70867728950e/read', $t->calls[0]['path']);
         self::assertSame('Bearer sp_app_x', $t->calls[0]['headers']['Authorization']);
         self::assertSame('de', $t->calls[0]['headers']['Accept-Language']);
-        self::assertSame('php/0.2.1', $t->calls[0]['headers']['X-SApp']);
+        self::assertSame('php/0.2.2', $t->calls[0]['headers']['X-SApp']);
 
-        foreach (PartnerApi::operations() as $id => $op) {
-            if ($op->method === 'GET' && $op->auth === 'token' && $op->query !== [] && !str_contains($op->path, '{')) {
-                $method = new \ReflectionMethod(PartnerApi::class, $id);
-                $arg = null;
-                foreach ($method->getParameters() as $p) {
-                    $type = $p->getType();
-                    if ($type instanceof \ReflectionNamedType && in_array($type->getName(), ['bool', 'mixed'], true)) {
-                        $arg = $p->getName();
-                        break;
-                    }
-                }
-                if ($arg === null) {
-                    continue;
-                }
-                $sr->api->{$id}(...[$arg => true]);
-                self::assertSame($op->path, $t->calls[1]['path']);
-                self::assertContains('1', $t->calls[1]['query']);
-                return;
-            }
-        }
-        self::fail('no GET operation with a boolean query parameter');
+        // Booleans in the query are sent as 1 / 0.
+        $sr->api->platformAppStoreCategory('shop', 3, inStock: true);
+        self::assertSame('/app/v1/stores/shop/categories/3', $t->calls[1]['path']);
+        self::assertSame(['in_stock' => '1'], $t->calls[1]['query']);
     }
 
     public function testPublicCallsSendTheAppKeyAndTheClientCode(): void
@@ -351,5 +335,108 @@ final class SdkTest extends TestCase
             }
         }
         self::markTestSkipped('no multipart operation in the spec');
+    }
+
+    private const UUID = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/';
+
+    public function testHeaderParametersAreSentAndNeverReplaceAuthorizationOrTheAppKey(): void
+    {
+        $t = new FakeTransport([[200, ['result' => true]], [200, ['result' => true]]]);
+        $sr = self::client($t, ['clientCode' => 'k3m9q2', 'appKey' => 'sp_appkey_1', 'tokenStore' => self::signedIn()]);
+        $sr->api->platformAppGuestStoreCart('shop', guestCartToken: 'cart-1');
+        $this->assertSame('/app/v1/clients/k3m9q2/guest/stores/shop/cart', $t->calls[0]['path']);
+        $this->assertSame('cart-1', $t->calls[0]['headers']['X-Guest-Cart-Token']);
+        $this->assertSame('sp_appkey_1', $t->calls[0]['headers']['X-App-Key']);
+        $this->assertSame([], $t->calls[0]['query']);
+        $sr->api->platformAppWalletCreateTopUp(['amount' => 10], idempotencyKey: 'key-1');
+        $this->assertSame('key-1', $t->calls[1]['headers']['Idempotency-Key']);
+        $this->assertSame('Bearer old', $t->calls[1]['headers']['Authorization']);
+        $this->assertStringStartsWith('php/', $t->calls[1]['headers']['X-SApp']);
+    }
+
+    public function testAnIdempotencyKeyIsMadePerCallAndKeptWhenTheCallIsSentAgain(): void
+    {
+        $t = new FakeTransport([[401, ['error' => 'invalid_token']], [200, self::tokenBody(2)], [200, ['result' => true]], [200, ['result' => true]]]);
+        $sr = self::client($t, ['tokenStore' => self::signedIn()]);
+        $sr->api->platformAppWalletCreateTopUp(['amount' => 10]);
+        $key = $t->calls[0]['headers']['Idempotency-Key'];
+        $this->assertMatchesRegularExpression(self::UUID, $key);
+        $this->assertSame($key, $t->calls[2]['headers']['Idempotency-Key']);
+        $this->assertSame('Bearer sp_app_access2', $t->calls[2]['headers']['Authorization']);
+        $this->assertArrayNotHasKey('Idempotency-Key', $t->calls[1]['headers']);
+        $sr->api->platformAppWalletCreateTopUp(['amount' => 10]);
+        $this->assertNotSame($key, $t->calls[3]['headers']['Idempotency-Key']);
+    }
+
+    public function testAHandMadeOperationThroughCallOperationBehavesLikeAGeneratedOne(): void
+    {
+        // A copy of the generated top-up operation, and an operation the generated API does not have.
+        $topUp = new Operation('POST', '/app/v1/wallet/top-ups', 'token', [], 'json', ['Idempotency-Key']);
+        $handMade = new Operation('GET', '/app/v1/clients/{clientCode}/guest/things/{id}', 'token_or_key', ['status'], null);
+        $t = new FakeTransport([
+            [200, ['result' => true]],
+            [401, ['error' => 'invalid_token']],
+            [200, self::tokenBody(2)],
+            [200, ['result' => true, 'data' => 7]],
+            [200, ['result' => true]],
+            [200, ['result' => false, 'code' => 'NOPE', 'message' => 'Refused.']],
+        ]);
+        $sr = self::client($t, ['tokenStore' => self::signedIn(), 'appKey' => 'sp_appkey_1']);
+        $sr->api->platformAppWalletCreateTopUp(['amount' => 10], idempotencyKey: 'key-1');
+        $this->assertSame(['result' => true, 'data' => 7], $sr->callOperation($topUp, ['extraQuery' => ['x' => 1]], ['amount' => 10]));
+        [$generated, $first, , $retried] = $t->calls;
+        $this->assertSame([$generated['method'], $generated['path'], $generated['raw']], [$first['method'], $first['path'], $first['raw']]);
+        $this->assertSame(['x' => '1'], $first['query']);
+        $this->assertSame('Bearer old', $first['headers']['Authorization']);
+        $this->assertSame('Bearer sp_app_access2', $retried['headers']['Authorization']);
+        $this->assertMatchesRegularExpression(self::UUID, $first['headers']['Idempotency-Key']);
+        $this->assertSame($first['headers']['Idempotency-Key'], $retried['headers']['Idempotency-Key']);
+        $sr->callOperation($handMade, ['id' => 5, 'status' => 'open']);
+        $this->assertSame('/app/v1/clients/c/guest/things/5', $t->calls[4]['path']);
+        $this->assertSame(['status' => 'open'], $t->calls[4]['query']);
+        $e = self::failure(fn () => $sr->callOperation($handMade, ['id' => 5]));
+        $this->assertSame([200, 'NOPE'], [$e->status, $e->errorCode]);
+    }
+
+    public function testTheOpenClientCallOperationGoesThroughTheSameCall(): void
+    {
+        $t = new FakeTransport([[200, ['ok' => true]]]);
+        $open = new OpenClient(apiKey: 'sk_open', transport: $t);
+        $this->assertSame(['ok' => true], $open->callOperation(new Operation('GET', '/v1/capabilities', 'token', [], null), ['extraQuery' => ['a' => 'b']]));
+        $this->assertSame(['/v1/capabilities', ['a' => 'b'], 'Bearer sk_open'], [$t->calls[0]['path'], $t->calls[0]['query'], $t->calls[0]['headers']['Authorization']]);
+    }
+
+    public function testTheExtraQueryIsAppendedAfterTheDeclaredParametersAndNeverReplacesOne(): void
+    {
+        $t = new FakeTransport([[200, ['result' => true]], [200, ['result' => true]]]);
+        $sr = self::client($t, ['tokenStore' => self::signedIn()]);
+        $sr->api->platformAppWallet(locale: 'fr', extraQuery: ['locale' => 'de', 'multiple' => 1, 'flag' => true, 'skip' => null]);
+        $this->assertSame(['locale' => 'fr', 'multiple' => '1', 'flag' => '1'], $t->calls[0]['query']);
+        $sr->api->customerAddressByPostcodePostcodeGet('M5V 2T6', extraQuery: ['multiple' => 1]);
+        $this->assertSame('/app/v1/address-by-postcode/M5V%202T6', $t->calls[1]['path']);
+        $this->assertSame(['multiple' => '1'], $t->calls[1]['query']);
+    }
+
+    public function testResultFalseIsRaisedEvenWithStatus200AndOtherAnswersAreReturned(): void
+    {
+        $refusal = [
+            'result' => false, 'code' => 'LABEL_CANCEL_FAILED', 'message' => 'The label could not be cancelled.',
+            'errors' => ['label' => ['The carrier refused the cancel.'], 'amount' => 5], 'reasons' => ['carrier_refused'],
+            'data' => ['order_id' => 9],
+        ];
+        $t = new FakeTransport([[200, $refusal, ['X-Request-Id' => 'req-9']], [200, ['result' => true, 'data' => 1]], [200, ['items' => []]], [200, [1, 2]]]);
+        $sr = self::client($t, ['tokenStore' => self::signedIn()]);
+        $e = self::failure(static fn () => $sr->api->platformAppWallet());
+        $this->assertSame(200, $e->status);
+        $this->assertSame('LABEL_CANCEL_FAILED', $e->errorCode);
+        $this->assertSame('The label could not be cancelled.', $e->getMessage());
+        $this->assertSame(['label' => ['The carrier refused the cancel.'], 'amount' => ['5']], $e->errors);
+        $this->assertSame(['carrier_refused'], $e->reasons);
+        $this->assertSame(['order_id' => 9], $e->data);
+        $this->assertSame($refusal, $e->body);
+        $this->assertSame('req-9', $e->requestId);
+        $this->assertSame(['result' => true, 'data' => 1], $sr->api->platformAppWallet());
+        $this->assertSame(['items' => []], $sr->api->platformAppWallet());
+        $this->assertSame([1, 2], $sr->api->platformAppWallet());
     }
 }

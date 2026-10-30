@@ -1,3 +1,62 @@
+# 0.2.2
+
+## Breaking changes
+
+### Every package and every UI kit
+- **Smart-locker operations moved to sLocker**: this is a breaking change for anyone calling smart-locker operations. The 29 locker pickup, locker location, locker storage and locker shop methods are no longer in the sApp packages, and the pickup list and the locker map are no longer in the Flutter, web, React, React Native, SwiftUI, Jetpack Compose, WPF and WinForms UI kits. sLocker 0.2.0 provides them under the same names, on top of the sApp core. Store orders stay in sApp, the locker open and refund of a store order included.
+
+| sApp 0.2.1 method (operationId) | Request | From 0.2.2 |
+|---|---|---|
+| `platformAppCollectPickup` | `POST /app/v1/pickups/{deliveryId}/collect` | sLocker, same operation name |
+| `platformAppHandOverPickup` | `POST /app/v1/pickups/{deliveryId}/handoff` | sLocker, same operation name |
+| `platformAppLockerLocation` | `GET /app/v1/locker-locations/{locationId}` | sLocker, same operation name |
+| `platformAppLockerLocationGuide` | `GET /app/v1/locker-locations/{locationId}/guide` | sLocker, same operation name |
+| `platformAppLockerLocationGuideFeedback` | `POST /app/v1/locker-locations/{locationId}/guide/feedback` | sLocker, same operation name |
+| `platformAppLockerLocations` | `GET /app/v1/locker-locations` | sLocker, same operation name |
+| `platformAppLockerShopCatalog` | `GET /app/v1/locker-locations/{locationId}/shop` | sLocker, same operation name |
+| `platformAppLockerShopCreateOrder` | `POST /app/v1/locker-shop/orders` | sLocker, same operation name |
+| `platformAppLockerShopIssueAccessCode` | `POST /app/v1/locker-shop/access-codes` | sLocker, same operation name |
+| `platformAppLockerShopItems` | `GET /app/v1/locker-shop/items` | sLocker, same operation name |
+| `platformAppLockerShopOpen` | `POST /app/v1/locker-shop/orders/{id}/open` | sLocker, same operation name |
+| `platformAppLockerShopOrder` | `GET /app/v1/locker-shop/orders/{id}` | sLocker, same operation name |
+| `platformAppLockerShopOrders` | `GET /app/v1/locker-shop/orders` | sLocker, same operation name |
+| `platformAppLockerShopRefundRequest` | `POST /app/v1/locker-shop/orders/{id}/refund-request` | sLocker, same operation name |
+| `platformAppLockerStorageClaim` | `POST /app/v1/locker-storage/rentals/claim` | sLocker, same operation name |
+| `platformAppLockerStorageDelivery` | `POST /app/v1/locker-storage/rentals/{id}/delivery` | sLocker, same operation name |
+| `platformAppLockerStorageKeep` | `POST /app/v1/locker-storage/rentals/{id}/keep` | sLocker, same operation name |
+| `platformAppLockerStorageOnwardQuote` | `POST /app/v1/locker-storage/rentals/{id}/onward-quote` | sLocker, same operation name |
+| `platformAppLockerStoragePickupSite` | `POST /app/v1/locker-storage/rentals/{id}/pickup-site` | sLocker, same operation name |
+| `platformAppLockerStoragePickupSiteCancel` | `POST /app/v1/locker-storage/rentals/{id}/pickup-site/cancel` | sLocker, same operation name |
+| `platformAppLockerStorageRental` | `GET /app/v1/locker-storage/rentals/{id}` | sLocker, same operation name |
+| `platformAppLockerStorageRentals` | `GET /app/v1/locker-storage/rentals` | sLocker, same operation name |
+| `platformAppLockerStorageResendCode` | `POST /app/v1/locker-storage/rentals/{id}/resend-code` | sLocker, same operation name |
+| `platformAppLockerStorageReturnTime` | `POST /app/v1/locker-storage/rentals/{id}/return-time` | sLocker, same operation name |
+| `platformAppLockerStorageShipment` | `POST /app/v1/locker-storage/rentals/{id}/shipment` | sLocker, same operation name |
+| `platformAppPickup` | `GET /app/v1/pickups/{deliveryId}` | sLocker, same operation name |
+| `platformAppPickups` | `GET /app/v1/pickups` | sLocker, same operation name |
+| `platformAppTakeBackPickup` | `POST /app/v1/pickups/{deliveryId}/handoff/revoke` | sLocker, same operation name |
+| `platformAppUpdateLockerPreference` | `PUT /app/v1/locker-locations/{locationId}/preference` | sLocker, same operation name |
+| UI component pickup list: Flutter `SrPickupList`, web `sr-pickup-list` (`SrPickupList`), React / React Native / SwiftUI / Compose `PickupList`, .NET `PickupListViewModel` and the WPF / WinForms `PickupList` control | — | sLocker UI kit |
+| UI component locker map and its sMap adapter: Flutter `SrLockerMap` (`SrSMapAdapter`, `SrMapAdapter`, `SrMapPoint`), web `sr-locker-map` (`SrLockerMap`, `smapAdapter`), React / React Native `LockerMap` (`smapAdapter`), SwiftUI `LockerMap` (`SRSMapAdapter`, `SRMapAdapter`, `SRMapPoint`), Compose `LockerMap` (`SrSMapAdapter`, `SrMapAdapter`, `SrMapPoint`), .NET `LockerMapViewModel` (`SMapAdapter`, `IMapAdapter`, `MapPoint`) and the WPF / WinForms `LockerMap` control | — | sLocker UI kit |
+
+## SDK
+
+### Every language
+- **Building on the sApp core**: the partner and open clients take a hand-made operation description (method, path, authentication, query names, header parameters, body kind) and call it exactly as a generated method: the same sign-in, refresh, idempotency keys, retries and errors. sLocker is built this way.
+- **Header parameters**: operations that take an idempotency key or a guest order, contact or cart token now accept it as an optional argument and send it as its header; the client's own sign-in headers always win.
+- **Idempotency keys made for you**: an order, top-up or label call that takes an idempotency key gets a fresh one when none is given, and keeps it when the call is sent again after a sign-in refresh.
+- **Extra query parameters**: every method takes query parameters the published spec does not list (such as `multiple=1` on the address-by-postcode lookup), added after the listed ones and never replacing one.
+- **Refusals with status 200 are errors**: an answer with `"result": false` is now raised as the SDK's error even when its status is 200, and the error carries the code, message, field errors, reasons and data of the answer. Answers without `result`, or with `"result": true`, are unchanged. Code that checked `result` on an answer should catch the error instead.
+
+### Dart and Flutter
+- **Secure token storage for Flutter**: `SecureTokenStore` in the Flutter UI kit keeps a partner app's sign-in in the Keychain or the Android Keystore, ready to pass as the client's token store.
+- **Transport library**: `package:sapp/transport.dart` gives packages that add their own connection profile the same request building, idempotency keys, extra query, retries and errors as the SDK's clients. Nothing changes for code that uses `package:sapp/sapp.dart`.
+
+## Licence
+
+### Every package
+- **Superroute SDK License**: from the next version the packages are licensed under the Superroute SDK License — see `LICENSE` and [open.superroute.ca/developer/license](https://open.superroute.ca/developer/license). Versions published before keep the licence they were published with.
+
 # 0.2.1
 
 ## SDK
