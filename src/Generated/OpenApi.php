@@ -57,6 +57,7 @@ final class OpenApi
             'planInsert' => new Operation('POST', '/v1/plan/insert', 'token', [], 'json'),
             'planMatrixCloseDelete' => new Operation('DELETE', '/v1/plan/matrix/{matrixId}', 'token', [], null),
             'planMatrixOpen' => new Operation('POST', '/v1/plan/matrix', 'token', [], 'json'),
+            'planMatrixPoints' => new Operation('POST', '/v1/plan/matrix/{matrixId}/points', 'token', [], 'json'),
             'planMove' => new Operation('POST', '/v1/plan/move', 'token', [], 'json'),
             'planRecost' => new Operation('POST', '/v1/plan/recost', 'token', [], 'json'),
             'planRefine' => new Operation('POST', '/v1/plan/refine', 'token', [], 'json'),
@@ -274,6 +275,12 @@ final class OpenApi
     public function planMatrixOpen(array $body, ?array $extraQuery = null): mixed
     {
         return ($this->call)(self::operations()['planMatrixOpen'], ['extraQuery' => $extraQuery], $body, []);
+    }
+
+    /** POST /v1/plan/matrix/{matrixId}/points — Measure new points of a distance snapshot */
+    public function planMatrixPoints(string $matrixId, array $body, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['planMatrixPoints'], ['matrixId' => $matrixId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** POST /v1/plan/move — Move stops */

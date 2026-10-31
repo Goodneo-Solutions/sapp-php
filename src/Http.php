@@ -7,7 +7,7 @@ namespace Superroute\SApp;
 /** @internal The request building and sending both clients share. */
 final class Http
 {
-    public const SDK_VERSION = '0.2.2';
+    public const SDK_VERSION = '0.2.5';
     public const DEFAULT_BASE_URL = 'https://open.superroute.ca';
 
     public static function defaultTransport(): Transport
@@ -244,7 +244,7 @@ final class Http
         $refused = $refuseResultFalse && is_array($body) && !array_is_list($body)
             && array_key_exists('result', $body) && $body['result'] === false;
         if ($response->status >= 400 || $refused) {
-            throw SuperrouteException::from($response->status, $body, $response->header('X-Request-Id'));
+            throw SuperrouteException::from($response->status, $body, $response->header('X-Request-Id'), $response->headers);
         }
 
         return $body;

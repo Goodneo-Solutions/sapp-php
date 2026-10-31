@@ -32,7 +32,8 @@ final class CurlTransport implements Transport
             CURLOPT_HEADERFUNCTION => static function ($ch, string $line) use (&$received): int {
                 $parts = explode(':', $line, 2);
                 if (count($parts) === 2) {
-                    $received[strtolower(trim($parts[0]))] = trim($parts[1]);
+                    $name = strtolower(trim($parts[0]));
+                    $received[$name] = isset($received[$name]) ? $received[$name] . ', ' . trim($parts[1]) : trim($parts[1]);
                 } elseif (str_starts_with($line, 'HTTP/')) {
                     $received = [];
                 }

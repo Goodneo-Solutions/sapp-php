@@ -111,7 +111,7 @@ final class SdkTest extends TestCase
         self::assertSame('/app/v1/notifications/0f8fad5b-d9cb-469f-a165-70867728950e/read', $t->calls[0]['path']);
         self::assertSame('Bearer sp_app_x', $t->calls[0]['headers']['Authorization']);
         self::assertSame('de', $t->calls[0]['headers']['Accept-Language']);
-        self::assertSame('php/0.2.2', $t->calls[0]['headers']['X-SApp']);
+        self::assertSame('php/0.2.5', $t->calls[0]['headers']['X-SApp']);
 
         // Booleans in the query are sent as 1 / 0.
         $sr->api->platformAppStoreCategory('shop', 3, inStock: true);
@@ -438,5 +438,61 @@ final class SdkTest extends TestCase
         $this->assertSame(['result' => true, 'data' => 1], $sr->api->platformAppWallet());
         $this->assertSame(['items' => []], $sr->api->platformAppWallet());
         $this->assertSame([1, 2], $sr->api->platformAppWallet());
+    }
+
+    public function testARefusedAnswerCarriesItsHeadersRetryAfterAndRequestId(): void
+    {
+        $t = new FakeTransport([[429, ['error' => 'too_many_requests'], ['Retry-After' => '7', 'X-Request-Id' => 'req-1', 'X-Extra' => 'a']]]);
+        $e = self::failure(fn () => self::client($t, ['tokenStore' => self::signedIn()])->api->platformAppWalletCreateTopUp(['amount' => 1]));
+        self::assertSame(429, $e->status);
+        self::assertSame(['retry-after' => '7', 'x-request-id' => 'req-1', 'x-extra' => 'a'], $e->headers);
+        self::assertSame(7, $e->retryAfter);
+        self::assertSame('req-1', $e->requestId);
+    }
+
+    public function testRetryAfterAsADateOrUnreadable(): void
+    {
+        $later = gmdate('D, d M Y H:i:s \G\M\T', time() + 30);
+        $past = gmdate('D, d M Y H:i:s \G\M\T', time() - 30);
+        $t = new FakeTransport([[503, null, ['Retry-After' => $later]], [503, null, ['Retry-After' => $past]], [503, null, ['Retry-After' => 'soon']]]);
+        $sr = self::client($t, ['tokenStore' => self::signedIn()]);
+        $a = self::failure(fn () => $sr->api->platformAppWalletCreateTopUp(['amount' => 1]))->retryAfter;
+        self::assertNotNull($a);
+        self::assertGreaterThanOrEqual(28, $a);
+        self::assertLessThanOrEqual(31, $a);
+        self::assertSame(0, self::failure(fn () => $sr->api->platformAppWalletCreateTopUp(['amount' => 1]))->retryAfter);
+        self::assertNull(self::failure(fn () => $sr->api->platformAppWalletCreateTopUp(['amount' => 1]))->retryAfter);
+    }
+
+    public function testANetworkErrorHasNoHeadersAndNoRetryAfter(): void
+    {
+        $t = new FakeTransport([['network', null]]);
+        $e = self::failure(fn () => self::client($t, ['tokenStore' => self::signedIn()])->api->platformAppWalletCreateTopUp(['amount' => 1]));
+        self::assertSame([0, 'network_error', [], null], [$e->status, $e->errorCode, $e->headers, $e->retryAfter]);
+    }
+
+    public function testTheTokenEndpointAndCallOperationRefusalsCarryTheMetadata(): void
+    {
+        $t = new FakeTransport([
+            [400, ['error' => 'invalid_grant'], ['X-Request-Id' => 'req-t', 'Retry-After' => '3']],
+            [200, ['result' => false, 'code' => 'NOPE'], ['X-Request-Id' => 'req-o']],
+            [200, ['errors' => [['message' => 'Unauthorized']]], ['X-Request-Id' => 'req-g']],
+        ]);
+        $sr = self::client($t, ['appKey' => 'sp_appkey_1']);
+        $e = self::failure(fn () => $sr->signInWithPassword('a', 'b'));
+        self::assertSame([400, 'req-t', 3, 'req-t'], [$e->status, $e->requestId, $e->retryAfter, $e->headers['x-request-id']]);
+        $e = self::failure(fn () => $sr->callOperation(new Operation('GET', '/app/v1/clients/{clientCode}/guest/things', 'key', [], null)));
+        self::assertSame(['NOPE', 'req-o', ['x-request-id' => 'req-o']], [$e->errorCode, $e->requestId, $e->headers]);
+        $e = self::failure(fn () => $sr->graphql('{ x }'));
+        self::assertSame(['graphql_error', 'req-g'], [$e->errorCode, $e->requestId]);
+    }
+
+    public function testTheOldConstructorKeepsWorking(): void
+    {
+        $e = new SuperrouteException(403, 'x', 'Refused.', ['a' => 1], 'req-2');
+        self::assertSame([403, 'x', 'Refused.', 'req-2', [], null], [$e->status, $e->errorCode, $e->getMessage(), $e->requestId, $e->headers, $e->retryAfter]);
+        $joined = SuperrouteException::from(429, null, null, ['Retry-After' => '5', 'Set-Cookie' => ['a', 'b']]);
+        self::assertSame(['retry-after' => '5', 'set-cookie' => 'a, b'], $joined->headers);
+        self::assertSame(5, $joined->retryAfter);
     }
 }

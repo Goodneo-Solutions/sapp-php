@@ -134,9 +134,13 @@ final class PartnerApi
             'driverUploadPicturesFromUrlsPost' => new Operation('POST', '/app/v1/driver/upload-pictures-from-urls', 'token', [], null),
             'health' => new Operation('GET', '/app/v1/health', 'none', [], null),
             'partnerAppDriverRegister' => new Operation('POST', '/app/v1/clients/{clientCode}/driver/register', 'key', [], 'json'),
+            'partnerAppGuestPickupPoints' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/pickup-points', 'key', ['latitude', 'longitude', 'search', 'pickup', 'return', 'available', 'page', 'per_page'], null),
+            'partnerAppGuestQuote' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/quotes/{line}', 'key', [], 'json'),
+            'partnerAppGuestQuoteSchema' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/quotes/schema', 'key', ['locale'], null),
             'partnerAppMe' => new Operation('GET', '/app/v1/me', 'token', [], null),
             'partnerAppRevokeSession' => new Operation('DELETE', '/app/v1/sessions/{sessionId}', 'token', [], null),
             'partnerAppSessions' => new Operation('GET', '/app/v1/sessions', 'token', [], null),
+            'partnerAppSwidget' => new Operation('GET', '/app/v1/clients/{clientCode}/swidget', 'key', [], null),
             'platformAppBootstrap' => new Operation('GET', '/app/v1/clients/{clientCode}/bootstrap', 'key', ['platform', 'app_version'], null),
             'platformAppCancelAccountDeletion' => new Operation('DELETE', '/app/v1/privacy/account-deletion', 'token', [], null),
             'platformAppCancelReturn' => new Operation('POST', '/app/v1/returns/{returnId}/cancel', 'token', [], null),
@@ -265,6 +269,7 @@ final class PartnerApi
             'platformAppStoreOrders' => new Operation('GET', '/app/v1/store-orders', 'token', ['scope', 'page', 'per_page', 'include', 'locale'], null),
             'platformAppStoreProduct' => new Operation('GET', '/app/v1/stores/{slug}/products/{productId}', 'token', ['locale'], null),
             'platformAppStorefront' => new Operation('GET', '/app/v1/storefront', 'token', ['locale'], null),
+            'platformAppSwidgetShow' => new Operation('GET', '/app/v1/clients/{clientCode}/swidgets/{widgetId}', 'key', [], null),
             'platformAppTrack' => new Operation('POST', '/app/v1/track', 'token', [], 'json'),
             'platformAppUpdateNotificationPreferences' => new Operation('PUT', '/app/v1/notifications/preferences', 'token', [], 'json'),
             'platformAppVerifyPhone' => new Operation('POST', '/app/v1/privacy/phone/verify', 'token', [], 'json'),
@@ -945,6 +950,24 @@ final class PartnerApi
         return ($this->call)(self::operations()['partnerAppDriverRegister'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
     }
 
+    /** GET /app/v1/clients/{clientCode}/guest/pickup-points — Pickup points (guest) */
+    public function partnerAppGuestPickupPoints(?string $clientCode = null, ?float $latitude = null, ?float $longitude = null, ?string $search = null, ?bool $pickup = null, ?bool $return = null, ?bool $available = null, ?int $page = null, ?int $perPage = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['partnerAppGuestPickupPoints'], ['clientCode' => $clientCode, 'latitude' => $latitude, 'longitude' => $longitude, 'search' => $search, 'pickup' => $pickup, 'return' => $return, 'available' => $available, 'page' => $page, 'per_page' => $perPage, 'extraQuery' => $extraQuery], null, []);
+    }
+
+    /** POST /app/v1/clients/{clientCode}/guest/quotes/{line} — Quote one line (guest) */
+    public function partnerAppGuestQuote(string $line, array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['partnerAppGuestQuote'], ['line' => $line, 'clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
+    }
+
+    /** GET /app/v1/clients/{clientCode}/guest/quotes/schema — Quote form (guest) */
+    public function partnerAppGuestQuoteSchema(?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['partnerAppGuestQuoteSchema'], ['clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
+    }
+
     /** GET /app/v1/me — Who the token speaks for */
     public function partnerAppMe(?array $extraQuery = null): mixed
     {
@@ -961,6 +984,12 @@ final class PartnerApi
     public function partnerAppSessions(?array $extraQuery = null): mixed
     {
         return ($this->call)(self::operations()['partnerAppSessions'], ['extraQuery' => $extraQuery], null, []);
+    }
+
+    /** GET /app/v1/clients/{clientCode}/swidget — sWidget configuration */
+    public function partnerAppSwidget(?string $clientCode = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['partnerAppSwidget'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/bootstrap — Bootstrap a client-assigned app */
@@ -1729,6 +1758,12 @@ final class PartnerApi
     public function platformAppStorefront(?string $locale = null, ?array $extraQuery = null): mixed
     {
         return ($this->call)(self::operations()['platformAppStorefront'], ['locale' => $locale, 'extraQuery' => $extraQuery], null, []);
+    }
+
+    /** GET /app/v1/clients/{clientCode}/swidgets/{widgetId} — Load a widget by its id */
+    public function platformAppSwidgetShow(string $widgetId, ?string $clientCode = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['platformAppSwidgetShow'], ['widgetId' => $widgetId, 'clientCode' => $clientCode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** POST /app/v1/track — Track any code (signed in) */

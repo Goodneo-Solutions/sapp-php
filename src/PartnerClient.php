@@ -163,7 +163,7 @@ final class PartnerClient
         );
         $body = Http::orThrow($response);
         if (!is_array($body) || !is_string($body['access_token'] ?? null)) {
-            throw new SuperrouteException($response->status, 'invalid_response', 'The token answer had no access token.', $body);
+            throw SuperrouteException::withAnswer($response->status, 'invalid_response', 'The token answer had no access token.', $body, $response->headers);
         }
         $expiresIn = is_numeric($body['expires_in'] ?? null) && (float) $body['expires_in'] > 0 ? (float) $body['expires_in'] : 3600.0;
         $tokens = new Tokens(
@@ -346,6 +346,16 @@ final class PartnerClient
      */
     private function call(Operation $operation, array $params, ?array $body, array $files): mixed
     {
+        return Http::orThrow($this->exchange($operation, $params, $body, $files), true);
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @param array<string, mixed>|null $body
+     * @param list<OperationFile> $files
+     */
+    private function exchange(Operation $operation, array $params, ?array $body, array $files): Response
+    {
         $url = Http::url($this->baseUrl, $operation, $params);
         [$encoded, $bodyHeaders] = Http::encodeBody($operation->body, $body, $files);
         $retryable = $operation->method === 'GET';
@@ -359,7 +369,7 @@ final class PartnerClient
             $response = Http::send($this->transport, $operation->method, $url, $headers, $encoded, $this->retries, $retryable, $this->sleep);
         }
 
-        return Http::orThrow($response, true);
+        return $response;
     }
 
     /**
@@ -369,15 +379,16 @@ final class PartnerClient
      */
     public function graphql(string $query, array $variables = []): mixed
     {
-        $answer = $this->call(
+        $response = $this->exchange(
             new Operation('POST', '/app/graphql', 'token_or_key', [], 'json'),
             [],
             ['query' => $query, 'variables' => $variables === [] ? new \stdClass() : $variables],
             [],
         );
+        $answer = Http::orThrow($response, true);
         if (is_array($answer) && is_array($answer['errors'] ?? null) && $answer['errors'] !== []) {
             $messages = array_map(static fn ($e) => is_array($e) && is_string($e['message'] ?? null) ? $e['message'] : '', $answer['errors']);
-            throw new SuperrouteException(200, 'graphql_error', implode(' ', $messages), $answer);
+            throw SuperrouteException::withAnswer(200, 'graphql_error', implode(' ', $messages), $answer, $response->headers);
         }
 
         return is_array($answer) ? ($answer['data'] ?? null) : null;

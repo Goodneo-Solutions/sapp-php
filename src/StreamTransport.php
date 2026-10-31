@@ -41,7 +41,8 @@ final class StreamTransport implements Transport
             }
             $parts = explode(':', $line, 2);
             if (count($parts) === 2) {
-                $received[strtolower(trim($parts[0]))] = trim($parts[1]);
+                $name = strtolower(trim($parts[0]));
+                $received[$name] = isset($received[$name]) ? $received[$name] . ', ' . trim($parts[1]) : trim($parts[1]);
             }
         }
 

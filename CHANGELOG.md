@@ -1,3 +1,27 @@
+# 0.2.5
+
+## SDK
+
+### Every language
+- **Quotes without signing in**: read the service provider's quote form and get a price for a line (local delivery, pickup, point to point, shipping or express) with the app key alone.
+- **Pickup points without signing in**: list the service provider's smart lockers and pickup point counters near a position or by search, with what each offers.
+- **Widget settings**: read the settings of an sWidget by its key, or load a widget the service provider enabled for your app by its id.
+- **Route editing on the Open Platform**: add new points, such as a stop dropped on a map, to a distance snapshot so the next insert or move can use them.
+- **More about a refused call**: the error now carries the answer's response headers and how many seconds to wait before trying again (`Retry-After`), beside the status and the request id it already had.
+
+### .NET
+- **Waiting after too many requests**: a `Retry-After` that is not a number of seconds now waits 1 second and tries again, as every other language does.
+
+## UI kits
+
+### Flutter, web, React, React Native, SwiftUI, Jetpack Compose, WPF and WinForms
+- **Guest quote**: a price form built from the service provider's quote lines — origin, destination postcode and country, units and packages — showing the price before tax, the tax and the total, and how long the price is valid.
+- **Guest shipping order**: a shipment without an account — sender, recipient and packages, a choice of prices, a code sent to the person's email or phone, then the payment page handed to the app; afterwards the shipment's status, tracking numbers, cancelling after a confirmation, the label handed to the app as a file, and the person's own shipments.
+- **Errors reach the app**: every component reports each failed call to the app (`sr-error` on the web, `onError` on React, React Native, Flutter, SwiftUI and Jetpack Compose, and on `SuperrouteScope`, the `ErrorOccurred` event in .NET) with the code, message, status, request id and seconds to wait, as well as showing it.
+
+### SwiftUI, Jetpack Compose, WPF and WinForms
+- **Dark mode and corner radius**: theme tokens take a light, dark or automatic mode (following the device) and a corner radius, set by the app or read from the service provider's branding.
+
 # 0.2.2
 
 ## Breaking changes

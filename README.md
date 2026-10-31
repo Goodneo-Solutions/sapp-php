@@ -23,24 +23,24 @@ PHP: [Goodneo-Solutions/sapp-php](https://github.com/Goodneo-Solutions/sapp-php)
 
 | Package | Platform | Status |
 |---|---|---|
-| [`@superrouteca/sapp`](https://www.npmjs.com/package/@superrouteca/sapp) | JavaScript and TypeScript: web, Node 20+, React Native | 0.2.2 |
-| [`@superrouteca/sapp-react`](https://www.npmjs.com/package/@superrouteca/sapp-react) | React: provider and hooks | 0.2.2 |
-| [`@superrouteca/sapp-react-native`](https://www.npmjs.com/package/@superrouteca/sapp-react-native) | React Native: hooks, secure token store | 0.2.2 |
-| [`sapp`](https://pub.dev/packages/sapp) | Dart and Flutter | 0.2.2 |
-| [`SApp`](https://github.com/Goodneo-Solutions/sapp-releases) (Swift Package Manager) | iOS 15+, macOS 12+ | 0.2.2 |
-| [`ca.superroute:sapp` / `sapp-android`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Kotlin on the JVM and Android 7+ | 0.2.2 |
-| [`Superroute.SApp`](https://www.nuget.org/packages/Superroute.SApp) (NuGet) | .NET 8: Windows apps and servers | 0.2.2 |
-| [`superroute-sapp`](https://pypi.org/project/superroute-sapp/) (PyPI, `import sapp`) | Python 3.9+: servers and scripts | 0.2.2 |
-| [`superroute/sapp`](https://packagist.org/packages/superroute/sapp) (Packagist) | PHP 8.1+: servers | 0.2.2 |
-| [`github.com/Goodneo-Solutions/sapp-releases/go`](https://github.com/Goodneo-Solutions/sapp-releases/tree/main/go) | Go 1.21+: servers | 0.2.2 |
-| [`ca.superroute:sapp-java`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Java 17+: servers, no dependencies | 0.2.2 |
-| [`sapp_ui`](https://pub.dev/packages/sapp_ui) | Flutter UI kit: sign-in, notifications, wallet, orders, pickups | 0.2.2 |
-| [`@superrouteca/sapp-ui`](https://www.npmjs.com/package/@superrouteca/sapp-ui) | Web UI kit: the same components as custom elements | 0.2.2 |
-| `@superrouteca/sapp-react/ui` | React components over the web UI kit | 0.2.2 |
-| [`SAppUI`](https://github.com/Goodneo-Solutions/sapp-releases) (Swift Package Manager) | SwiftUI UI kit: iOS 15+, macOS 12+ | 0.2.2 |
-| [`ca.superroute:sapp-ui-android`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Jetpack Compose UI kit: Android 7+ | 0.2.2 |
-| `@superrouteca/sapp-react-native/ui` | React Native UI kit | 0.2.2 |
-| [`Superroute.SApp.Wpf`](https://www.nuget.org/packages/Superroute.SApp.Wpf) / [`Superroute.SApp.WinForms`](https://www.nuget.org/packages/Superroute.SApp.WinForms) (NuGet) | WPF and WinForms UI kits over `Superroute.SApp.UI` | 0.2.2 |
+| [`@superrouteca/sapp`](https://www.npmjs.com/package/@superrouteca/sapp) | JavaScript and TypeScript: web, Node 20+, React Native | 0.2.5 |
+| [`@superrouteca/sapp-react`](https://www.npmjs.com/package/@superrouteca/sapp-react) | React: provider and hooks | 0.2.5 |
+| [`@superrouteca/sapp-react-native`](https://www.npmjs.com/package/@superrouteca/sapp-react-native) | React Native: hooks, secure token store | 0.2.5 |
+| [`sapp`](https://pub.dev/packages/sapp) | Dart and Flutter | 0.2.5 |
+| [`SApp`](https://github.com/Goodneo-Solutions/sapp-releases) (Swift Package Manager) | iOS 15+, macOS 12+ | 0.2.5 |
+| [`ca.superroute:sapp` / `sapp-android`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Kotlin on the JVM and Android 7+ | 0.2.5 |
+| [`Superroute.SApp`](https://www.nuget.org/packages/Superroute.SApp) (NuGet) | .NET 8: Windows apps and servers | 0.2.5 |
+| [`superroute-sapp`](https://pypi.org/project/superroute-sapp/) (PyPI, `import sapp`) | Python 3.9+: servers and scripts | 0.2.5 |
+| [`superroute/sapp`](https://packagist.org/packages/superroute/sapp) (Packagist) | PHP 8.1+: servers | 0.2.5 |
+| [`github.com/Goodneo-Solutions/sapp-releases/go`](https://github.com/Goodneo-Solutions/sapp-releases/tree/main/go) | Go 1.21+: servers | 0.2.5 |
+| [`ca.superroute:sapp-java`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Java 17+: servers, no dependencies | 0.2.5 |
+| [`sapp_ui`](https://pub.dev/packages/sapp_ui) | Flutter UI kit: sign-in, notifications, wallet, orders, pickups | 0.2.5 |
+| [`@superrouteca/sapp-ui`](https://www.npmjs.com/package/@superrouteca/sapp-ui) | Web UI kit: the same components as custom elements | 0.2.5 |
+| `@superrouteca/sapp-react/ui` | React components over the web UI kit | 0.2.5 |
+| [`SAppUI`](https://github.com/Goodneo-Solutions/sapp-releases) (Swift Package Manager) | SwiftUI UI kit: iOS 15+, macOS 12+ | 0.2.5 |
+| [`ca.superroute:sapp-ui-android`](https://github.com/Goodneo-Solutions/sapp-releases) (Maven) | Jetpack Compose UI kit: Android 7+ | 0.2.5 |
+| `@superrouteca/sapp-react-native/ui` | React Native UI kit | 0.2.5 |
+| [`Superroute.SApp.Wpf`](https://www.nuget.org/packages/Superroute.SApp.Wpf) / [`Superroute.SApp.WinForms`](https://www.nuget.org/packages/Superroute.SApp.WinForms) (NuGet) | WPF and WinForms UI kits over `Superroute.SApp.UI` | 0.2.5 |
 
 Every package of a release carries the same version. Version numbers never contain the digits 3 or 4.
 
@@ -112,7 +112,7 @@ final notifications = await sr.api.platformAppNotifications();
 
 ```swift
 // Package.swift
-.package(url: "https://github.com/Goodneo-Solutions/sapp-releases", from: "0.2.2")
+.package(url: "https://github.com/Goodneo-Solutions/sapp-releases", from: "0.2.5")
 // in the target: .product(name: "SApp", package: "sapp-releases"), and .product(name: "SAppUI", package: "sapp-releases") for the UI kit
 ```
 
@@ -146,8 +146,8 @@ dependencyResolutionManagement {
 }
 
 // build.gradle.kts: ca.superroute:sapp on the JVM, sapp-android on Android, sapp-ui-android for the Compose kit
-implementation("ca.superroute:sapp-android:0.2.2")
-implementation("ca.superroute:sapp-ui-android:0.2.2")
+implementation("ca.superroute:sapp-android:0.2.5")
+implementation("ca.superroute:sapp-ui-android:0.2.5")
 ```
 
 ```kotlin
@@ -226,7 +226,7 @@ Answers decode into `any` (numbers as `float64`). Failures are `*sapp.Error`.
 
 ```java
 // build.gradle.kts: repositories { maven("https://goodneo-solutions.github.io/sapp-releases/maven") }
-implementation("ca.superroute:sapp-java:0.2.2")
+implementation("ca.superroute:sapp-java:0.2.5")
 
 PartnerClient sr = PartnerClient.builder("p_acme_parcels").clientCode("k3m9q2").appKey("sp_appkey_…").build();
 sr.signInWithIdToken(googleIdToken);
