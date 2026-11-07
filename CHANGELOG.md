@@ -1,3 +1,16 @@
+# 0.2.6
+
+## SDK
+
+### Every language
+- **Made-to-measure products**: ask a configurable product's answer for the buyer's answers (which choices are available and why not, the size ranges, the errors and the price), and add it to the cart with its configuration.
+
+## UI kits
+
+### Flutter, web, React, React Native, SwiftUI, Jetpack Compose, WPF and WinForms
+- **Own colours**: `ThemeTokens.withColors()` (Dart) replaces some colours of a theme, for an app that draws a kit component in its own colours.
+- **Configurable products in the product page**: a made-to-measure product shows its options — choices as text buttons, cards, image or colour swatches, lists or checkboxes, sizes with a unit switch and fractions of an inch, numbers, text and a confirmation — with help for each option, the reason beside every choice that is not available, the price with its details, and add to cart with the configuration. The price and the rules come from the service provider.
+
 # 0.2.5
 
 ## SDK

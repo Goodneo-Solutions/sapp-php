@@ -7,7 +7,7 @@ namespace Superroute\SApp;
 /** @internal The request building and sending both clients share. */
 final class Http
 {
-    public const SDK_VERSION = '0.2.5';
+    public const SDK_VERSION = '0.2.6';
     public const DEFAULT_BASE_URL = 'https://open.superroute.ca';
 
     public static function defaultTransport(): Transport

@@ -111,7 +111,7 @@ final class SdkTest extends TestCase
         self::assertSame('/app/v1/notifications/0f8fad5b-d9cb-469f-a165-70867728950e/read', $t->calls[0]['path']);
         self::assertSame('Bearer sp_app_x', $t->calls[0]['headers']['Authorization']);
         self::assertSame('de', $t->calls[0]['headers']['Accept-Language']);
-        self::assertSame('php/0.2.5', $t->calls[0]['headers']['X-SApp']);
+        self::assertSame('php/0.2.6', $t->calls[0]['headers']['X-SApp']);
 
         // Booleans in the query are sent as 1 / 0.
         $sr->api->platformAppStoreCategory('shop', 3, inStock: true);

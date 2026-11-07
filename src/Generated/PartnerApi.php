@@ -133,6 +133,7 @@ final class PartnerApi
             'driverUploadPictures' => new Operation('POST', '/app/v1/driver/upload-pictures', 'token', [], 'json'),
             'driverUploadPicturesFromUrlsPost' => new Operation('POST', '/app/v1/driver/upload-pictures-from-urls', 'token', [], null),
             'health' => new Operation('GET', '/app/v1/health', 'none', [], null),
+            'openappSwidgetConfig' => new Operation('GET', '/app/v1/clients/{clientCode}/swidget', 'key', [], null),
             'partnerAppDriverRegister' => new Operation('POST', '/app/v1/clients/{clientCode}/driver/register', 'key', [], 'json'),
             'partnerAppGuestPickupPoints' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/pickup-points', 'key', ['latitude', 'longitude', 'search', 'pickup', 'return', 'available', 'page', 'per_page'], null),
             'partnerAppGuestQuote' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/quotes/{line}', 'key', [], 'json'),
@@ -140,7 +141,6 @@ final class PartnerApi
             'partnerAppMe' => new Operation('GET', '/app/v1/me', 'token', [], null),
             'partnerAppRevokeSession' => new Operation('DELETE', '/app/v1/sessions/{sessionId}', 'token', [], null),
             'partnerAppSessions' => new Operation('GET', '/app/v1/sessions', 'token', [], null),
-            'partnerAppSwidget' => new Operation('GET', '/app/v1/clients/{clientCode}/swidget', 'key', [], null),
             'platformAppBootstrap' => new Operation('GET', '/app/v1/clients/{clientCode}/bootstrap', 'key', ['platform', 'app_version'], null),
             'platformAppCancelAccountDeletion' => new Operation('DELETE', '/app/v1/privacy/account-deletion', 'token', [], null),
             'platformAppCancelReturn' => new Operation('POST', '/app/v1/returns/{returnId}/cancel', 'token', [], null),
@@ -207,6 +207,7 @@ final class PartnerApi
             'platformAppGuestStoreOrderReturn' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/return', 'key', ['locale'], 'json', ['X-Guest-Order-Token']),
             'platformAppGuestStoreOrderReview' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/store-orders/{code}/review/{productId}', 'key', ['locale'], 'json', ['X-Guest-Order-Token']),
             'platformAppGuestStoreProduct' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/stores/{slug}/products/{productId}', 'key', ['locale'], null),
+            'platformAppGuestStoreProductConfigure' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/stores/{slug}/products/{productId}/configure', 'key', [], 'json'),
             'platformAppGuestStorefront' => new Operation('GET', '/app/v1/clients/{clientCode}/guest/storefront', 'key', ['locale'], null),
             'platformAppGuestTrack' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/track', 'key', [], 'json'),
             'platformAppGuestVerifyComplete' => new Operation('POST', '/app/v1/clients/{clientCode}/guest/verify/complete', 'key', [], 'json'),
@@ -268,6 +269,7 @@ final class PartnerApi
             'platformAppStoreOrderReview' => new Operation('POST', '/app/v1/store-orders/{code}/review/{productId}', 'token', ['locale'], 'json'),
             'platformAppStoreOrders' => new Operation('GET', '/app/v1/store-orders', 'token', ['scope', 'page', 'per_page', 'include', 'locale'], null),
             'platformAppStoreProduct' => new Operation('GET', '/app/v1/stores/{slug}/products/{productId}', 'token', ['locale'], null),
+            'platformAppStoreProductConfigure' => new Operation('POST', '/app/v1/stores/{slug}/products/{productId}/configure', 'token', [], 'json'),
             'platformAppStorefront' => new Operation('GET', '/app/v1/storefront', 'token', ['locale'], null),
             'platformAppSwidgetShow' => new Operation('GET', '/app/v1/clients/{clientCode}/swidgets/{widgetId}', 'key', [], null),
             'platformAppTrack' => new Operation('POST', '/app/v1/track', 'token', [], 'json'),
@@ -944,6 +946,12 @@ final class PartnerApi
         return ($this->call)(self::operations()['health'], ['extraQuery' => $extraQuery], null, []);
     }
 
+    /** GET /app/v1/clients/{clientCode}/swidget — sWidget configuration */
+    public function openappSwidgetConfig(?string $clientCode = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['openappSwidgetConfig'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], null, []);
+    }
+
     /** POST /app/v1/clients/{clientCode}/driver/register — Sign up a driver */
     public function partnerAppDriverRegister(array $body, ?string $clientCode = null, ?array $extraQuery = null): mixed
     {
@@ -984,12 +992,6 @@ final class PartnerApi
     public function partnerAppSessions(?array $extraQuery = null): mixed
     {
         return ($this->call)(self::operations()['partnerAppSessions'], ['extraQuery' => $extraQuery], null, []);
-    }
-
-    /** GET /app/v1/clients/{clientCode}/swidget — sWidget configuration */
-    public function partnerAppSwidget(?string $clientCode = null, ?array $extraQuery = null): mixed
-    {
-        return ($this->call)(self::operations()['partnerAppSwidget'], ['clientCode' => $clientCode, 'extraQuery' => $extraQuery], null, []);
     }
 
     /** GET /app/v1/clients/{clientCode}/bootstrap — Bootstrap a client-assigned app */
@@ -1388,6 +1390,12 @@ final class PartnerApi
         return ($this->call)(self::operations()['platformAppGuestStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'clientCode' => $clientCode, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
     }
 
+    /** POST /app/v1/clients/{clientCode}/guest/stores/{slug}/products/{productId}/configure — Configure a product (guest) */
+    public function platformAppGuestStoreProductConfigure(string $slug, int $productId, ?string $clientCode = null, ?array $body = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['platformAppGuestStoreProductConfigure'], ['slug' => $slug, 'productId' => $productId, 'clientCode' => $clientCode, 'extraQuery' => $extraQuery], $body, []);
+    }
+
     /** GET /app/v1/clients/{clientCode}/guest/storefront — Storefront entry (guest) */
     public function platformAppGuestStorefront(?string $clientCode = null, ?string $locale = null, ?array $extraQuery = null): mixed
     {
@@ -1752,6 +1760,12 @@ final class PartnerApi
     public function platformAppStoreProduct(string $slug, int $productId, ?string $locale = null, ?array $extraQuery = null): mixed
     {
         return ($this->call)(self::operations()['platformAppStoreProduct'], ['slug' => $slug, 'productId' => $productId, 'locale' => $locale, 'extraQuery' => $extraQuery], null, []);
+    }
+
+    /** POST /app/v1/stores/{slug}/products/{productId}/configure — Configure a product */
+    public function platformAppStoreProductConfigure(string $slug, int $productId, ?array $body = null, ?array $extraQuery = null): mixed
+    {
+        return ($this->call)(self::operations()['platformAppStoreProductConfigure'], ['slug' => $slug, 'productId' => $productId, 'extraQuery' => $extraQuery], $body, []);
     }
 
     /** GET /app/v1/storefront — Storefront entry */
